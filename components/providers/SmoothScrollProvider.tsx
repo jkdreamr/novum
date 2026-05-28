@@ -18,12 +18,14 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
 
     lenis.on('scroll', ScrollTrigger.update);
 
-    gsap.ticker.add((time) => lenis.raf(time * 1000));
+    // Store the ticker callback in a stable ref so we can remove it on cleanup
+    const tickerCb = (time: number) => lenis.raf(time * 1000);
+    gsap.ticker.add(tickerCb);
     gsap.ticker.lagSmoothing(0);
 
     return () => {
+      gsap.ticker.remove(tickerCb);
       lenis.destroy();
-      gsap.ticker.remove((time) => lenis.raf(time * 1000));
     };
   }, []);
 

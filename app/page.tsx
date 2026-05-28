@@ -2,13 +2,13 @@
 import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { gsap } from 'gsap';
-
-const IntroSequence = dynamic(() => import('@/components/intro/IntroSequence'), { ssr: false });
 import HeroSection  from '@/components/hero/HeroSection';
 import AboutSection from '@/components/about/AboutSection';
 import TeamSection  from '@/components/team/TeamSection';
 import JoinSection  from '@/components/join/JoinSection';
 import Footer       from '@/components/shared/Footer';
+
+const IntroSequence = dynamic(() => import('@/components/intro/IntroSequence'), { ssr: false });
 
 export default function Home() {
   const [showIntro, setShowIntro]   = useState(false);

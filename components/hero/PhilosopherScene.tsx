@@ -1,9 +1,22 @@
 'use client';
-import { useRef, Suspense } from 'react';
+import { useRef, Suspense, Component, ReactNode } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useGLTF, Environment, ContactShadows } from '@react-three/drei';
 import * as THREE from 'three';
 import { useMousePosition } from '@/hooks/useMousePosition';
+
+// --- Error boundary so a missing/broken GLB falls back gracefully ---
+interface EBState { hasError: boolean }
+class GLBErrorBoundary extends Component<{ children: ReactNode; fallback: ReactNode }, EBState> {
+  constructor(props: { children: ReactNode; fallback: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() { return { hasError: true }; }
+  render() {
+    return this.state.hasError ? this.props.fallback : this.props.children;
+  }
+}
 
 function BustModel({ url }: { url: string }) {
   const gltf = useGLTF(url);
@@ -20,38 +33,6 @@ function BustModel({ url }: { url: string }) {
   });
 
   return <primitive object={gltf.scene} />;
-}
-
-function Bust() {
-  const groupRef  = useRef<THREE.Group>(null);
-  const mouse     = useMousePosition();
-  const targetRot = useRef({ x: 0, y: 0 });
-
-  useFrame(() => {
-    if (!groupRef.current) return;
-    // Auto-rotate + mouse tracking (max ±8°)
-    targetRot.current.y += 0.004;
-    const mx = mouse.current.x * 0.14;
-    const my = mouse.current.y * 0.08;
-    groupRef.current.rotation.y += (targetRot.current.y + mx - groupRef.current.rotation.y) * 0.04;
-    groupRef.current.rotation.x += (my - groupRef.current.rotation.x) * 0.04;
-  });
-
-  return (
-    <group ref={groupRef} position={[0.8, -0.5, 0]}>
-      <Suspense fallback={<ProceduralBust />}>
-        <BustModelWithFallback />
-      </Suspense>
-    </group>
-  );
-}
-
-function BustModelWithFallback() {
-  try {
-    return <BustModel url="/models/bust.glb" />;
-  } catch {
-    return <ProceduralBust />;
-  }
 }
 
 function ProceduralBust() {
@@ -78,6 +59,32 @@ function ProceduralBust() {
         <meshStandardMaterial color="#8a7048" metalness={0.2} roughness={0.8} />
       </mesh>
     </>
+  );
+}
+
+function Bust() {
+  const groupRef  = useRef<THREE.Group>(null);
+  const mouse     = useMousePosition();
+  const targetRot = useRef({ x: 0, y: 0 });
+
+  useFrame(() => {
+    if (!groupRef.current) return;
+    // Auto-rotate + mouse tracking (max ±8°)
+    targetRot.current.y += 0.004;
+    const mx = mouse.current.x * 0.14;
+    const my = mouse.current.y * 0.08;
+    groupRef.current.rotation.y += (targetRot.current.y + mx - groupRef.current.rotation.y) * 0.04;
+    groupRef.current.rotation.x += (my - groupRef.current.rotation.x) * 0.04;
+  });
+
+  return (
+    <group ref={groupRef} position={[0.8, -0.5, 0]} scale={1.4}>
+      <GLBErrorBoundary fallback={<ProceduralBust />}>
+        <Suspense fallback={<ProceduralBust />}>
+          <BustModel url="/models/bust.glb" />
+        </Suspense>
+      </GLBErrorBoundary>
+    </group>
   );
 }
 
