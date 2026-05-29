@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { spaceGrotesk, spaceMono } from '@/lib/fonts';
+import { fontVariables } from '@/lib/fonts';
 import '@/app/globals.css';
 
 export const metadata: Metadata = {
@@ -13,7 +13,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${spaceMono.variable}`}>
+    <html lang="en" className={fontVariables}>
       <body>{children}</body>
     </html>
   );

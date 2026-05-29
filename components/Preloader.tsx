@@ -1,12 +1,20 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
-// Words cycle as the count climbs and morph toward the brand: the disciplines render in mono,
-// then the final NOVUM lands large in the display face right before the wipe.
-const WORDS = ['MUSIC', 'VISUALS', 'PERFORMANCE', 'SYSTEMS', 'NOVUM'];
-const COUNT_MS = 1700; // 0 → 100
+// Each frame renders the word in a DIFFERENT typeface so the type itself shapeshifts as the
+// counter climbs, landing on NOVUM in the primary display face.
+type Frame = { word: string; font: string; italic?: boolean; final?: boolean };
+const SEQUENCE: Frame[] = [
+  { word: 'MUSIC', font: 'var(--font-mono)' },
+  { word: 'VISUALS', font: 'var(--font-serif)' },
+  { word: 'PERFORMANCE', font: 'var(--font-condensed)' },
+  { word: 'SYSTEMS', font: 'var(--font-extended)' },
+  { word: 'SOUND', font: 'var(--font-contrast)', italic: true },
+  { word: 'NOVUM', font: 'var(--font-display)', final: true },
+];
+const COUNT_MS = 1900; // 0 → 100, ~315ms per word
 
 type Phase = 'idle' | 'counting' | 'wiping' | 'gone';
 
@@ -51,8 +59,7 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
         raf = requestAnimationFrame(tick);
       } else {
         setCount(100);
-        // Let the big NOVUM land and hold a beat before wiping.
-        window.setTimeout(() => setPhase('wiping'), 450);
+        window.setTimeout(() => setPhase('wiping'), 420);
       }
     };
     raf = requestAnimationFrame(tick);
@@ -60,7 +67,7 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Failsafe: never leave the overlay up if the wipe's onAnimationComplete doesn't fire.
+  // Failsafe: lift the overlay even if the wipe's onAnimationComplete never fires.
   useEffect(() => {
     if (phase !== 'wiping') return;
     const id = window.setTimeout(finish, 1000);
@@ -70,9 +77,12 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
 
   if (phase === 'gone') return null;
 
-  const activeWord = Math.min(WORDS.length - 1, Math.floor((count / 100) * WORDS.length));
-  const word = WORDS[activeWord];
-  const isFinal = activeWord === WORDS.length - 1;
+  const idx = Math.min(SEQUENCE.length - 1, Math.floor((count / 100) * SEQUENCE.length));
+  const frame = SEQUENCE[idx];
+  const wordStyle: CSSProperties = {
+    fontFamily: frame.font,
+    fontStyle: frame.italic ? 'italic' : 'normal',
+  };
 
   return (
     <motion.div
@@ -96,22 +106,23 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
         ( LOADING )
       </span>
 
-      {/* Center word — mono disciplines morphing into the big display NOVUM. */}
+      {/* Center word — a different typeface each frame, ending big on NOVUM. */}
       <div className="absolute inset-0 flex items-center justify-center px-6">
         <AnimatePresence>
           <motion.span
-            key={word}
-            initial={{ opacity: 0, y: 14 }}
+            key={frame.word}
+            style={wordStyle}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -14 }}
-            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
             className={
-              isFinal
-                ? 'absolute font-display font-medium uppercase leading-none tracking-[-0.04em] text-bone text-[clamp(3.5rem,16vw,13rem)]'
-                : 'absolute font-mono uppercase tracking-label text-bone/75 text-[clamp(1.25rem,3.5vw,2.25rem)]'
+              frame.final
+                ? 'absolute font-medium uppercase leading-none tracking-[-0.04em] text-bone text-[clamp(3.5rem,16vw,12rem)]'
+                : 'absolute uppercase leading-none tracking-[0.02em] text-bone text-[clamp(1.75rem,6vw,3.5rem)]'
             }
           >
-            {word}
+            {frame.word}
           </motion.span>
         </AnimatePresence>
       </div>

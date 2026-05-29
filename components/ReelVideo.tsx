@@ -34,7 +34,7 @@ export default function ReelVideo({ className = '', poster }: ReelVideoProps) {
       loop
       playsInline
       autoPlay={!reduced}
-      preload="auto"
+      preload="metadata"
       aria-hidden="true"
       tabIndex={-1}
     />

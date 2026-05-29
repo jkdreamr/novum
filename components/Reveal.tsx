@@ -72,23 +72,21 @@ export default function Reveal({
       setShown(true);
       return;
     }
-    // Never leave content hidden longer than this, whatever the observer does.
-    const failsafe = window.setTimeout(() => setShown(true), 900);
+    // Reveal as the element enters view (the negative bottom margin triggers slightly early).
+    // No time-based failsafe: that would reveal off-screen content before you scroll to it,
+    // which defeats the scroll-reveal. The element is only faded/offset (never clipped out of
+    // view), so the observer reliably fires when it scrolls in.
     const io = new IntersectionObserver(
       (entries) => {
         if (entries.some((e) => e.isIntersecting)) {
           setShown(true);
-          window.clearTimeout(failsafe);
           io.disconnect();
         }
       },
-      { threshold: 0.12 },
+      { rootMargin: '0px 0px -10% 0px', threshold: 0 },
     );
     io.observe(el);
-    return () => {
-      window.clearTimeout(failsafe);
-      io.disconnect();
-    };
+    return () => io.disconnect();
   }, [reduced]);
 
   const Tag = as;

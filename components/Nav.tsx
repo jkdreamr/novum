@@ -70,7 +70,7 @@ export default function Nav() {
         {/* Mobile toggle */}
         <button
           type="button"
-          className="text-xs uppercase tracking-label md:hidden"
+          className="-m-2 p-2 text-xs uppercase tracking-label md:hidden"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-controls="mobile-menu"

@@ -21,7 +21,7 @@ export default function Footer() {
       <div className="flex flex-col gap-10 border-t border-bone/15 pt-10 sm:flex-row sm:justify-between">
         {/* Index */}
         <nav aria-label="Sections" className="flex flex-col items-start gap-3">
-          <span className="mb-2 text-[0.7rem] uppercase tracking-label text-bone/40">( Index )</span>
+          <span className="mb-2 text-[0.7rem] uppercase tracking-label text-bone/40">( Menu )</span>
           {INDEX.map((l) => (
             <HoverLink
               key={l.target}

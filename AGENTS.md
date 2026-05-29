@@ -20,12 +20,14 @@ Tagline: "Artists building the tools behind their art." Copy is sourced from the
 - Lint: `pnpm lint`
 
 ## Fonts (next/font/google — no external CSS @import)
-- Display: **Space Grotesk** (variable, weights 300–700) → CSS var `--font-display`, Tailwind
-  `font-display`. Big headings use `font-medium` (500).
-- Mono: **Space Mono** (400/700 + italic) → CSS var `--font-mono`, Tailwind `font-mono`.
-- Body default font is the mono; big editorial headings use `font-display`.
-- Wired in `lib/fonts.ts`, applied on `<html>` in `app/layout.tsx`.
-- `next/font` fetches the faces at build time and self-hosts them (needs network during build).
+- Display: **Space Grotesk** (variable) → `--font-display`, Tailwind `font-display`. Headings
+  use `font-medium`. Mono: **Space Mono** → `--font-mono`, Tailwind `font-mono` (also the body
+  default).
+- Four extra faces, loaded ONLY for the preloader's per-word font cycling: **Instrument Serif**
+  (`--font-serif`), **Oswald** (`--font-condensed`), **Syne** (`--font-extended`), **Playfair
+  Display** italic (`--font-contrast`).
+- All six are wired in `lib/fonts.ts` (exported as `fontVariables`) and applied together on
+  `<html>` in `app/layout.tsx`. `next/font` fetches + self-hosts at build time (needs network).
 
 ## Design tokens (`tailwind.config.ts`)
 - Colors: `ink` #0A0A0A (bg), `bone` #EDE8DF (text), `accent` #C8FF5E (faded acid-lime, used
@@ -39,30 +41,35 @@ Tagline: "Artists building the tools behind their art." Copy is sourced from the
 - `hooks/useLenis.ts` keeps a single shared Lenis instance; `scrollToTarget()` / `scrollToTop()`
   let nav + back-to-top drive it (with a native-scroll fallback under reduced motion).
 - Consistent page gutter everywhere: `px-6 sm:px-10 lg:px-16` (24/40/64px). Nav, all sections,
-  and the footer share it so headlines + labels align to one left margin. The `Showreel` video
-  is a deliberate full-bleed exception (its caption row keeps the gutter).
+  and the footer share it so headlines + labels align to one left margin.
 - EXACTLY three sections: `components/sections/{About,Team,Join}`. About = hero only — a PURE
   TYPE headline (no media embedded), flush left, framed by small mono labels. Team = condensed
   Joshua + Anna rows with a click-to-expand accordion (one open at a time, keyboard-accessible
   buttons w/ aria-expanded/aria-controls). Join = statement + four ways in + Apply + styled email
   + closing line. `Showreel` is a transition (not a section) between About and Team.
 - Components: `Preloader`, `Nav`, `HoverLink` (doubled-text reveal; a/button/span), `Reveal`,
-  `ReelVideo` (shared reel element), `Showreel` (clean full-bleed reel), `Footer`.
-- `Preloader`: oversized mono counter pinned bottom-left ticking 00→100, a center word sequence
-  (MUSIC → VISUALS → PERFORMANCE → SYSTEMS in mono, then a big display-face NOVUM as the finale),
-  then a fast wipe-up reveal (~2s total, once per session). Reduced-motion skips it. An
-  onAnimationComplete + 1s failsafe guarantee the overlay always lifts.
-- Video: `public/novum-reel.mp4` (~1.4MB, 1280×720), played via `ReelVideo` ONLY in `Showreel` —
-  a clean full-bleed band with the caption ABOVE it (never text over the footage). Always
-  muted/loop/playsInline/autoPlay/preload, no controls; autoplay disabled under reduced-motion.
-  `poster="/novum-reel-poster.jpg"` is referenced — ADD that file (not yet in repo); until then
-  the video's first frame + the solid bg behind act as the fallback.
-- `Reveal` is safe by construction: it renders plain VISIBLE text on the server / no-JS / first
-  paint / reduced-motion, then (after mount, before paint) switches to an animated version that
-  starts hidden and reveals when its OWN element scrolls into view. The hidden state is only
-  opacity + a small offset/scale — it NEVER clips itself out of an overflow-hidden ancestor (the
-  old `mask` variant did, which broke the IntersectionObserver and left every heading invisible).
-  A 900ms failsafe guarantees content is shown even if the observer never fires.
+  `ReelVideo` (shared reel element), `Showreel` (type+video composition), `Footer`.
+- `Preloader`: oversized mono counter pinned bottom-left ticking 00→100; a center word that
+  cycles MUSIC → VISUALS → PERFORMANCE → SYSTEMS → SOUND → NOVUM with EACH word in a DIFFERENT
+  typeface (mono / serif / condensed / extended / italic-contrast), landing on NOVUM in the
+  display face; then a fast wipe-up (~2s, once per session). Reduced-motion skips it;
+  onAnimationComplete + 1s failsafe always lift the overlay.
+- `Showreel` (the video moment) is composed WITH big type, never a bare screen. Desktop +
+  motion-OK → a pinned, scroll-LINKED expand (`useScroll`/`useTransform`, raw): the reel grows
+  from a small jewel toward full-bleed while the "BUILD THE NEW MEDIUM" headline parallaxes past
+  via mix-blend-difference. Mobile / reduced-motion / SSR → a stacked composition (headline +
+  framed reel) that reveals on scroll, no pinning (smooth on phones). Switch is mount-detected
+  via matchMedia `(min-width:768px) and (prefers-reduced-motion:no-preference)`.
+- Video: `public/novum-reel.mp4` (~1.4MB), via `ReelVideo` in `Showreel` only. muted / loop /
+  playsInline / autoPlay / `preload="metadata"` (iOS inline) / no controls; autoplay off under
+  reduced-motion. `poster="/novum-reel-poster.jpg"` is referenced — ADD that file (not in repo
+  yet); meanwhile the first frame + solid bg are the fallback.
+- `Reveal` is safe by construction: plain VISIBLE text on server / no-JS / first paint /
+  reduced-motion, then (after mount, before paint) an animated version that starts hidden and
+  reveals when its OWN element enters view (IntersectionObserver, `rootMargin -10%` so it fires
+  as it scrolls in). Hidden state is opacity + a small offset only (never clipped out of view).
+  NOTE: no time-based failsafe — that pre-revealed off-screen content and killed the scroll
+  reveal; the observer is reliable because the element is never clipped.
 - Motion CSS lives in `globals.css`: `.reel-grain` (placeholder media grain) and the
   `.hover-link` doubled-text mask.
 - All motion respects `prefers-reduced-motion`: no preloader animation, no video autoplay, and
