@@ -21,6 +21,13 @@ export default function Page() {
     window.scrollTo(0, 0);
   }, []);
 
+  // Hard safety net: the scroll lock can NEVER outlive this, even if the preloader's
+  // onComplete somehow doesn't fire. Guarantees the page is scrollable on mobile.
+  useEffect(() => {
+    const t = window.setTimeout(() => setReady(true), 4000);
+    return () => window.clearTimeout(t);
+  }, []);
+
   // Lock scrolling (class + Lenis) until the preloader hands off.
   useEffect(() => {
     const root = document.documentElement;

@@ -21,9 +21,9 @@ html {
   background: var(--ink);
   color: var(--bone);
   color-scheme: dark;
-  /* Lenis owns smooth scrolling; keep native behaviour off so the two don't fight. */
   scroll-behavior: auto;
   -webkit-text-size-adjust: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -35,11 +35,11 @@ body {
   overflow-x: hidden;
 }
 
-/* Scroll is frozen while the preloader is on screen (Lenis is also stopped in JS). */
+/* Scroll is frozen only while the preloader is on screen. Plain overflow:hidden (no height
+   pinning, which misbehaves on iOS); the preloader hard-dismiss guarantees this is temporary. */
 html.is-locked,
 html.is-locked body {
   overflow: hidden !important;
-  height: 100%;
 }
 
 /* ---- Doubled-text hover link -------------------------------------------------

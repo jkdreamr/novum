@@ -27,7 +27,7 @@ export default function Footer() {
               key={l.target}
               href={l.target}
               onClick={go(l.target)}
-              className="text-sm uppercase tracking-label"
+              className="py-1.5 text-sm uppercase tracking-label"
             >
               {l.label}
             </HoverLink>
@@ -38,13 +38,16 @@ export default function Footer() {
         <div className="flex flex-col items-start gap-3">
           <span className="mb-2 text-[0.7rem] uppercase tracking-label text-bone/40">( Reach out )</span>
           {/* PLACEHOLDER contacts — confirm/replace the address + handle. */}
-          <HoverLink href="mailto:hello@novum.example" className="text-sm uppercase tracking-label">
+          <HoverLink
+            href="mailto:hello@novum.example"
+            className="py-1.5 text-sm uppercase tracking-label"
+          >
             Email
           </HoverLink>
           <HoverLink
             href="#"
             onClick={(e) => e.preventDefault()}
-            className="text-sm uppercase tracking-label"
+            className="py-1.5 text-sm uppercase tracking-label"
           >
             Instagram
           </HoverLink>
@@ -66,7 +69,7 @@ export default function Footer() {
             scrollToTop();
           }}
           ariaLabel="Back to top"
-          className="text-base"
+          className="-m-2 p-2 text-base"
         >
           ( ↑ )
         </HoverLink>

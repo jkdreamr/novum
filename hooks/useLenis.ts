@@ -35,11 +35,12 @@ export function scrollToTop() {
  *  unmount. Call this from one always-mounted client component (the page root). */
 export function useLenis() {
   useEffect(() => {
-    // Respect reduced-motion: no momentum scrolling, no shared instance.
-    const prefersReduced =
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReduced) return;
+    // Respect reduced-motion, and use NATIVE scroll on touch devices — Lenis smoothing on
+    // touch can stutter or trap mobile scroll. scrollToTarget/scrollToTop fall back to native
+    // when there's no Lenis instance, so nav + back-to-top still work.
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isTouch = window.matchMedia('(pointer: coarse)').matches;
+    if (prefersReduced || isTouch) return;
 
     const instance = new Lenis({
       duration: 1.2,

@@ -72,10 +72,18 @@ export default function Reveal({
       setShown(true);
       return;
     }
-    // Reveal as the element enters view (the negative bottom margin triggers slightly early).
-    // No time-based failsafe: that would reveal off-screen content before you scroll to it,
-    // which defeats the scroll-reveal. The element is only faded/offset (never clipped out of
-    // view), so the observer reliably fires when it scrolls in.
+
+    // 1) If it's already on screen at mount, reveal immediately — never depend on the observer
+    //    firing for above-the-fold content. (The hero being stuck at opacity:0 because the
+    //    observer didn't fire was the mobile blank.)
+    const vh = window.innerHeight || document.documentElement.clientHeight || 0;
+    const rect = el.getBoundingClientRect();
+    if (rect.top < vh * 0.92 && rect.bottom > 0) {
+      setShown(true);
+      return;
+    }
+
+    // 2) Otherwise reveal when it scrolls into view (slightly early via the bottom margin).
     const io = new IntersectionObserver(
       (entries) => {
         if (entries.some((e) => e.isIntersecting)) {
@@ -86,7 +94,17 @@ export default function Reveal({
       { rootMargin: '0px 0px -10% 0px', threshold: 0 },
     );
     io.observe(el);
-    return () => io.disconnect();
+
+    // 3) Absolute catch-all: never leave content hidden, even if the observer never fires.
+    const failsafe = window.setTimeout(() => {
+      setShown(true);
+      io.disconnect();
+    }, 2500);
+
+    return () => {
+      io.disconnect();
+      window.clearTimeout(failsafe);
+    };
   }, [reduced]);
 
   const Tag = as;

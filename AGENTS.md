@@ -35,11 +35,26 @@ Tagline: "Artists building the tools behind their art." Copy is sourced from the
 - `tracking-label` = 0.18em for small uppercase labels; `ease-editorial` shared easing.
 
 ## Architecture
-- `app/page.tsx` (client) is the orchestrator: inits Lenis via `useLenis()`, renders the
-  Preloader / Nav / sections / Footer, and locks scroll (`html.is-locked` + Lenis stop) until
-  the preloader hands off. No custom cursor — the native cursor is used everywhere.
-- `hooks/useLenis.ts` keeps a single shared Lenis instance; `scrollToTarget()` / `scrollToTop()`
-  let nav + back-to-top drive it (with a native-scroll fallback under reduced motion).
+- `app/page.tsx` (client) is the orchestrator: renders Preloader / Nav / sections / Footer and
+  locks scroll (`html.is-locked`) until the preloader hands off. No custom cursor — native
+  cursor everywhere.
+- `hooks/useLenis.ts` keeps a single shared Lenis instance for SMOOTH scroll on desktop only —
+  it bails out under reduced-motion AND on touch devices (`pointer: coarse`), so phones use
+  native scroll (no smoothing to stutter or trap). `scrollToTarget()` / `scrollToTop()` fall
+  back to native `scrollIntoView` / `scrollTo` when there's no Lenis instance.
+
+## Mobile-visibility guarantees (why the page can't go blank)
+- Preloader has an UNCONDITIONAL hard dismiss (`HARD_DISMISS_MS = 3500`): a mount timeout that
+  always sets `phase='gone'` (unmounts the overlay) + `finish()` (hands off), regardless of
+  rAF/animation. Plus `page.tsx` force-sets `ready` after 4s as a second backstop, so the scroll
+  lock can never persist. The wipe also has a 700ms onAnimationComplete failsafe.
+- `Reveal` can never leave content invisible: it renders plain visible text on SSR/no-JS/first
+  paint/reduced-motion; once mounted it reveals immediately if the element is already in view
+  (rect check — the above-the-fold guarantee), via IntersectionObserver as it scrolls in, and a
+  2.5s catch-all otherwise.
+- `Showreel` only pins/scroll-links on desktop (`min-width:768px` + no-preference); mobile gets a
+  stacked, non-pinned composition. About uses `min-h-[100svh]` (not `vh`). `html`/`body` are
+  `overflow-x:hidden`; the lock is plain `overflow:hidden` (no iOS-finicky height pinning).
 - Consistent page gutter everywhere: `px-6 sm:px-10 lg:px-16` (24/40/64px). Nav, all sections,
   and the footer share it so headlines + labels align to one left margin.
 - EXACTLY three sections: `components/sections/{About,Team,Join}`. About = hero only — a PURE

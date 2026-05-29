@@ -14,7 +14,8 @@ const SEQUENCE: Frame[] = [
   { word: 'SOUND', font: 'var(--font-contrast)', italic: true },
   { word: 'NOVUM', font: 'var(--font-display)', final: true },
 ];
-const COUNT_MS = 1900; // 0 → 100, ~315ms per word
+const COUNT_MS = 1600; // 0 → 100
+const HARD_DISMISS_MS = 3500; // absolute backstop: the overlay can NEVER trap the page past this
 
 type Phase = 'idle' | 'counting' | 'wiping' | 'gone';
 
@@ -33,6 +34,18 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
     }
     onComplete();
   };
+
+  // Hard, UNCONDITIONAL dismiss. Runs no matter what (rAF throttled, animation stalled, error):
+  // after the backstop the overlay unmounts and the page is handed off. This is the guarantee
+  // that the preloader can never leave a blank screen on mobile.
+  useEffect(() => {
+    const hard = window.setTimeout(() => {
+      setPhase('gone');
+      finish();
+    }, HARD_DISMISS_MS);
+    return () => window.clearTimeout(hard);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     let seen = false;
@@ -59,7 +72,7 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
         raf = requestAnimationFrame(tick);
       } else {
         setCount(100);
-        window.setTimeout(() => setPhase('wiping'), 420);
+        window.setTimeout(() => setPhase('wiping'), 300);
       }
     };
     raf = requestAnimationFrame(tick);
@@ -67,10 +80,13 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Failsafe: lift the overlay even if the wipe's onAnimationComplete never fires.
+  // Failsafe: if the wipe's onAnimationComplete never fires, unmount + hand off anyway.
   useEffect(() => {
     if (phase !== 'wiping') return;
-    const id = window.setTimeout(finish, 1000);
+    const id = window.setTimeout(() => {
+      setPhase('gone');
+      finish();
+    }, 700);
     return () => window.clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
@@ -90,7 +106,7 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
       className="fixed inset-0 z-[9995] overflow-hidden bg-ink"
       initial={{ y: 0 }}
       animate={phase === 'wiping' ? { y: '-100%' } : { y: 0 }}
-      transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
+      transition={{ duration: 0.6, ease: [0.76, 0, 0.24, 1] }}
       onAnimationComplete={() => {
         if (phase === 'wiping') {
           setPhase('gone');
