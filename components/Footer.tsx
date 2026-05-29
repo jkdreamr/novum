@@ -53,7 +53,7 @@ export default function Footer() {
         {/* Identity */}
         <div className="flex flex-col items-start gap-2 text-[0.7rem] uppercase tracking-label text-bone/45 sm:items-end sm:text-right">
           <span>NOVUM — Artists building the tools behind their art.</span>
-          <span>( EST. 2026 · KOREA ↔ SF )</span>
+          <span>( EST. 2026 )</span>
         </div>
       </div>
 

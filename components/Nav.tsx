@@ -74,7 +74,6 @@ export default function Nav() {
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-controls="mobile-menu"
-          data-cursor="link"
         >
           {open ? '( Close )' : '( Menu )'}
         </button>

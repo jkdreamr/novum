@@ -1,3 +1,7 @@
+'use client';
+
+import { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import Reveal from '@/components/Reveal';
 
 type Member = {
@@ -22,72 +26,107 @@ const TEAM: Member[] = [
   },
 ];
 
-function TeamRow({ member }: { member: Member }) {
+function MemberRow({
+  member,
+  open,
+  onToggle,
+}: {
+  member: Member;
+  open: boolean;
+  onToggle: () => void;
+}) {
+  const panelId = `team-panel-${member.index}`;
   return (
-    <li className="group border-t border-bone/15">
-      <div className="grid grid-cols-12 gap-x-6 gap-y-8 py-[clamp(2.5rem,6vw,5rem)] md:items-end">
-        {/* Text side */}
-        <div className="col-span-12 md:col-span-8">
-          <div className="mb-6 flex items-center gap-5 text-[0.7rem] uppercase tracking-label text-bone/45">
-            <span className="transition-colors duration-500 group-hover:text-accent">
-              ( {member.index} )
-            </span>
-            <span className="h-px w-10 bg-bone/20" aria-hidden="true" />
-            <span>{member.role}</span>
-          </div>
-          <h3 className="font-display font-medium uppercase leading-[0.92] tracking-[-0.03em] text-bone text-[clamp(2.25rem,7vw,5.5rem)] transition-transform duration-500 ease-editorial group-hover:translate-x-2 md:group-hover:translate-x-5">
-            <Reveal variant="rise">{member.name}</Reveal>
-          </h3>
-          <Reveal variant="rise" delay={0.05}>
-            <p className="mt-6 max-w-[46ch] text-xs uppercase leading-relaxed tracking-label text-bone/55">
-              {member.focus}
-            </p>
-          </Reveal>
-        </div>
+    <li className="border-t border-bone/15 last:border-b">
+      {/* Resting header — compact, click to expand. */}
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        aria-controls={panelId}
+        className="group flex w-full cursor-pointer items-center gap-5 py-6 text-left"
+      >
+        <span className="shrink-0 text-[0.7rem] uppercase tracking-label text-bone/45 transition-colors duration-300 group-hover:text-accent">
+          ( {member.index} )
+        </span>
 
-        {/* Image side (opposite the text). PLACEHOLDER — swap for a real <Image />. */}
-        <div className="col-span-12 md:col-span-4">
-          <Reveal variant="clip">
-            <div
-              data-cursor="VIEW"
-              className="relative aspect-[4/3] w-full overflow-hidden border border-bone/15 bg-bone/[0.04]"
-            >
-              <div className="reel-grain absolute inset-0 opacity-[0.05]" />
-              <div className="absolute inset-0 flex items-center justify-center opacity-70 transition-all duration-500 ease-editorial group-hover:scale-[1.03] group-hover:opacity-100">
-                <span className="text-[0.65rem] uppercase tracking-label text-bone/30">
+        <span className="flex min-w-0 flex-1 flex-col gap-1.5">
+          <span className="truncate font-display font-medium uppercase leading-none tracking-[-0.03em] text-bone text-[clamp(1.6rem,5vw,3.25rem)]">
+            {member.name}
+          </span>
+          <span className="text-[0.7rem] uppercase tracking-label text-bone/55">{member.role}</span>
+        </span>
+
+        {/* Thumbnail (PLACEHOLDER — swap for a real photo). */}
+        <span className="relative hidden h-14 w-20 shrink-0 overflow-hidden border border-bone/15 bg-bone/[0.05] sm:block">
+          <span className="reel-grain absolute inset-0 opacity-[0.05]" aria-hidden="true" />
+        </span>
+
+        <span className="shrink-0 text-[0.7rem] uppercase tracking-label text-bone/40 transition-colors duration-300 group-hover:text-bone/70">
+          {open ? '( Close )' : '( Expand )'}
+        </span>
+      </button>
+
+      {/* Expanding panel — one open at a time. */}
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            id={panelId}
+            key="panel"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden"
+          >
+            <div className="grid grid-cols-1 gap-6 pb-8 md:grid-cols-12 md:gap-8">
+              {/* Larger image (PLACEHOLDER). */}
+              <div className="relative col-span-1 aspect-[4/3] overflow-hidden border border-bone/15 bg-bone/[0.04] md:col-span-5">
+                <div className="reel-grain absolute inset-0 opacity-[0.05]" />
+                <span className="absolute bottom-3 left-3 text-[0.6rem] uppercase tracking-label text-bone/40">
                   ( {member.index} / Image )
                 </span>
               </div>
-              <span className="absolute bottom-3 left-3 text-[0.6rem] uppercase tracking-label text-transparent transition-colors duration-500 group-hover:text-bone/60">
-                ( View )
-              </span>
+              {/* Focus blurb */}
+              <div className="col-span-1 md:col-span-7">
+                <p className="max-w-[44ch] text-xs uppercase leading-relaxed tracking-label text-bone/60">
+                  {member.focus}
+                </p>
+              </div>
             </div>
-          </Reveal>
-        </div>
-      </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </li>
   );
 }
 
 export default function Team() {
+  const [open, setOpen] = useState<string | null>(null);
+
   return (
-    <section id="team" className="px-5 py-[clamp(6rem,12vw,12rem)] sm:px-8">
+    <section id="team" className="px-5 py-[clamp(6rem,12vw,11rem)] sm:px-8">
       {/* Section header */}
-      <div className="mb-[clamp(3rem,7vw,6rem)] grid grid-cols-12 gap-y-6">
+      <div className="mb-[clamp(2.5rem,6vw,5rem)] grid grid-cols-12 gap-y-6">
         <span className="col-span-12 text-[0.7rem] uppercase tracking-label text-bone/50 md:col-span-3">
           ( 02 / TEAM )
         </span>
-        <div className="col-span-12 md:col-span-9">
+        <div className="col-span-12 flex items-baseline justify-between gap-6 md:col-span-9">
           <h2 className="font-display font-medium uppercase leading-[0.95] tracking-[-0.02em] text-bone text-[clamp(1.5rem,4vw,2.75rem)]">
             <Reveal variant="rise">THE PEOPLE BUILDING IT.</Reveal>
           </h2>
+          <span className="shrink-0 text-[0.7rem] uppercase tracking-label text-bone/40">( Click me )</span>
         </div>
       </div>
 
-      {/* Team rows */}
-      <ul className="border-b border-bone/15">
+      <ul>
         {TEAM.map((m) => (
-          <TeamRow key={m.index} member={m} />
+          <MemberRow
+            key={m.index}
+            member={m}
+            open={open === m.index}
+            onToggle={() => setOpen((cur) => (cur === m.index ? null : m.index))}
+          />
         ))}
       </ul>
     </section>

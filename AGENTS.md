@@ -34,28 +34,41 @@ Tagline: "Artists building the tools behind their art." Copy is sourced from the
 
 ## Architecture
 - `app/page.tsx` (client) is the orchestrator: inits Lenis via `useLenis()`, renders the
-  Preloader/Cursor/Nav/sections/Footer, and locks scroll (`html.is-locked` + Lenis stop)
-  until the preloader hands off.
+  Preloader / Nav / sections / Footer, and locks scroll (`html.is-locked` + Lenis stop) until
+  the preloader hands off. No custom cursor — the native cursor is used everywhere.
 - `hooks/useLenis.ts` keeps a single shared Lenis instance; `scrollToTarget()` / `scrollToTop()`
   let nav + back-to-top drive it (with a native-scroll fallback under reduced motion).
-- EXACTLY three sections: `components/sections/{About,Team,Join}` (About = hero only; Team =
-  Joshua + Anna rows; Join = statement + four ways in + Apply + styled email + closing line).
-- Components: `Preloader` (counter + cross-fading words + wipe), `Cursor` (small fast-tracking
-  ring, stiff spring, no label bubble), `Nav`, `HoverLink` (doubled-text reveal; renders
-  a/button/span), `Reveal`, `Marquee` (one thin divider between About/Team), `Footer`.
+- EXACTLY three sections: `components/sections/{About,Team,Join}`. About = hero only (huge
+  left-aligned headline with the reel chip embedded after "TOOLS"); Team = condensed Joshua +
+  Anna rows with a click-to-expand accordion (one open at a time, keyboard-accessible buttons
+  with aria-expanded/aria-controls); Join = statement + four ways in + Apply + styled email +
+  closing line. `ScrollExpand` is a transition (not a section) between About and Team.
+- Components: `Preloader` (counter + cross-fading words + wipe), `Nav`, `HoverLink` (doubled-text
+  reveal; renders a/button/span), `Reveal`, `ReelVideo` (the shared reel element), `ScrollExpand`
+  (scroll-linked expand showreel), `Footer`.
+- Video: `public/novum-reel.mp4` (~1.4MB, 1280×720). Played via `ReelVideo` in TWO places — the
+  inline headline chip in About, and the `ScrollExpand` showreel. Always muted/loop/playsInline/
+  autoPlay/preload, no controls; autoplay is disabled under reduced-motion (shows the still first
+  frame). No poster image yet (first frame is used); a solid bg sits behind as the load fallback.
+- `ScrollExpand` uses framer `useScroll`+`useTransform` (raw, no spring) on a pinned sticky stage
+  inside a 230vh track: the reel scales 0.42→1 toward full-bleed as you scroll while the headline
+  drifts past with opposing parallax. Reduced-motion → a static, fully-visible reel.
 - `Reveal` is safe by construction: it renders plain VISIBLE text on the server / no-JS / first
   paint / reduced-motion, then (after mount, before paint) switches to an animated version that
   starts hidden and reveals when its OWN element scrolls into view. The hidden state is only
   opacity + a small offset/scale — it NEVER clips itself out of an overflow-hidden ancestor (the
   old `mask` variant did, which broke the IntersectionObserver and left every heading invisible).
   A 900ms failsafe guarantees content is shown even if the observer never fires.
-- Motion CSS lives in `globals.css`: `.marquee-track`, `.reel-grain` (placeholder media grain),
-  `.scroll-arrow`, and the `.hover-link` doubled-text mask.
-- All motion respects `prefers-reduced-motion`: no custom cursor, no preloader animation,
-  marquee freezes, and `Reveal` renders content statically.
+- Motion CSS lives in `globals.css`: `.reel-grain` (placeholder media grain), `.scroll-arrow`,
+  and the `.hover-link` doubled-text mask.
+- All motion respects `prefers-reduced-motion`: no preloader animation, no scroll-expand, no
+  video autoplay, and `Reveal` renders content statically.
 
 ## Placeholders to replace (search "PLACEHOLDER")
-- Team images (`components/sections/Team.tsx`) — swap framed grain blocks for real `<Image>`.
+- Team thumbnails + expanded images (`components/sections/Team.tsx`) — swap grain blocks for
+  real photos.
+- Optional: add a poster still for the reel (e.g. `public/novum-reel-poster.jpg`) and pass it to
+  `<ReelVideo poster=... />` in About + ScrollExpand.
 - Join email capture is styled-only (non-functional) — wire to an endpoint to enable.
 - Address: `hello@novum.example` (Join Apply + Footer Email); Instagram `#` (Footer).
 

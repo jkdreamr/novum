@@ -1,28 +1,44 @@
 import Reveal from '@/components/Reveal';
+import ReelVideo from '@/components/ReelVideo';
+
+/**
+ * Inline media chip embedded mid-headline (adcker "FOR BEAUTY ( [img] )" move): the NOVUM reel
+ * playing muted/looping right after the word TOOLS. Solid bg sits behind as the load fallback.
+ */
+function HeadlineChip() {
+  return (
+    <span className="relative mx-[0.16em] inline-flex aspect-video h-[clamp(3rem,6.5vw,7rem)] translate-y-[0.04em] items-center justify-center overflow-hidden rounded-[6px] border border-bone/40 bg-bone/[0.06] align-middle">
+      <span className="reel-grain absolute inset-0 opacity-[0.06]" aria-hidden="true" />
+      <ReelVideo className="absolute inset-0 h-full w-full object-cover" />
+    </span>
+  );
+}
 
 export default function About() {
   return (
     <section id="about" className="px-5 sm:px-8">
       <div className="flex min-h-[100svh] flex-col justify-between pb-10 pt-[clamp(7rem,14vw,11rem)]">
         {/* Top frame labels */}
-        <div className="flex items-start justify-between text-[0.7rem] uppercase tracking-label text-bone/50">
+        <div className="flex items-start justify-between gap-6 text-[0.7rem] uppercase tracking-label text-bone/50">
           <Reveal variant="fade" as="span">
             ( 01 / ABOUT )
           </Reveal>
           <Reveal variant="fade" delay={0.05} as="span">
-            ( KOREA ↔ SF )
+            ( LABEL · COLLECTIVE · CREATIVE LAB )
           </Reveal>
         </div>
 
-        {/* HERO HEADLINE — huge, bone, left-aligned, three deliberate lines. */}
-        <h1 className="font-display font-medium uppercase leading-[0.95] tracking-[-0.03em] text-bone text-[clamp(2.5rem,10vw,11rem)]">
-          <Reveal variant="rise">
+        {/* HERO HEADLINE — solid block flush left, with the reel chip after TOOLS. */}
+        <h1 className="font-display font-medium uppercase leading-[0.9] tracking-[-0.035em] text-bone text-[clamp(2.5rem,10vw,11rem)]">
+          <Reveal variant="rise" duration={0.7}>
             <span className="block">ARTISTS BUILDING</span>
           </Reveal>
-          <Reveal variant="rise" delay={0.07}>
-            <span className="block">THE TOOLS BEHIND</span>
+          <Reveal variant="rise" delay={0.07} duration={0.7}>
+            <span className="block">
+              THE TOOLS <HeadlineChip /> BEHIND
+            </span>
           </Reveal>
-          <Reveal variant="rise" delay={0.14}>
+          <Reveal variant="rise" delay={0.14} duration={0.7}>
             <span className="block">THEIR ART.</span>
           </Reveal>
         </h1>
@@ -34,18 +50,13 @@ export default function About() {
               MUSIC / VISUALS / PERFORMANCE / SYSTEMS
             </Reveal>
             <Reveal variant="rise" delay={0.05} as="span">
-              ( LABEL · COLLECTIVE · CREATIVE LAB )
+              <span className="text-bone/45">A label, a collective, a creative lab — the next label is a lab.</span>
             </Reveal>
           </div>
-          <Reveal variant="rise" delay={0.1}>
-            <p className="max-w-[60ch] text-xs uppercase leading-relaxed tracking-label text-bone/60">
-              A label, a collective, a creative lab — the next label is a lab.
-            </p>
-          </Reveal>
           <div className="flex items-center justify-between text-[0.7rem] uppercase tracking-label text-bone/45">
             <span>( EST. 2026 )</span>
             <span className="inline-flex items-center gap-2">
-              ( scroll <span className="scroll-arrow">↓</span> )
+              ( SCROLL <span className="scroll-arrow">↓</span> )
             </span>
           </div>
         </div>

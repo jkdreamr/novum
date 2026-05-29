@@ -3,10 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useLenis, getLenis } from '@/hooks/useLenis';
 import Preloader from '@/components/Preloader';
-import Cursor from '@/components/Cursor';
 import Nav from '@/components/Nav';
-import Marquee from '@/components/Marquee';
 import About from '@/components/sections/About';
+import ScrollExpand from '@/components/ScrollExpand';
 import Team from '@/components/sections/Team';
 import Join from '@/components/sections/Join';
 import Footer from '@/components/Footer';
@@ -37,16 +36,11 @@ export default function Page() {
   return (
     <>
       <Preloader onComplete={() => setReady(true)} />
-      <Cursor />
       <Nav />
       <main>
         <About />
-        {/* Single thin marquee divider between sections (pure CSS — cannot get stuck hidden). */}
-        <Marquee
-          text="BUILD THE NEW MEDIUM · MUSIC · VISUALS · PERFORMANCE · SYSTEMS · "
-          durationSec={30}
-          className="border-y border-bone/15 py-4 text-xs uppercase tracking-label text-bone/60"
-        />
+        {/* Scroll-linked expand showreel — the dramatic transition into Team. */}
+        <ScrollExpand />
         <Team />
         <Join />
       </main>

@@ -11,8 +11,6 @@ type HoverLinkProps = {
   /** Render an external anchor (adds target + rel). */
   external?: boolean;
   ariaLabel?: string;
-  /** Value written to data-cursor; the custom cursor shows it as a label (e.g. "APPLY"). */
-  cursorLabel?: string;
 };
 
 /**
@@ -28,7 +26,6 @@ export default function HoverLink({
   className = '',
   external = false,
   ariaLabel,
-  cursorLabel = 'link',
 }: HoverLinkProps) {
   const inner = (
     <span className="hover-link__mask">
@@ -48,7 +45,6 @@ export default function HoverLink({
         onClick={onClick}
         className={classes}
         aria-label={ariaLabel}
-        data-cursor={cursorLabel}
         {...(external ? { target: '_blank', rel: 'noreferrer noopener' } : {})}
       >
         {inner}
@@ -58,22 +54,12 @@ export default function HoverLink({
 
   if (onClick) {
     return (
-      <button
-        type="button"
-        onClick={onClick}
-        className={classes}
-        aria-label={ariaLabel}
-        data-cursor={cursorLabel}
-      >
+      <button type="button" onClick={onClick} className={classes} aria-label={ariaLabel}>
         {inner}
       </button>
     );
   }
 
   // Presentational: keeps the hover reveal without being a focusable control.
-  return (
-    <span className={classes} data-cursor={cursorLabel}>
-      {inner}
-    </span>
-  );
+  return <span className={classes}>{inner}</span>;
 }

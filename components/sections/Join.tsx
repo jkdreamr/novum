@@ -63,7 +63,6 @@ export default function Join() {
             {/* PLACEHOLDER address — confirm/replace hello@novum.example. */}
             <HoverLink
               href="mailto:hello@novum.example"
-              cursorLabel="APPLY"
               className="font-display text-[clamp(2.75rem,9vw,6.5rem)] font-medium uppercase leading-none"
             >
               APPLY

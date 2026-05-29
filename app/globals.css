@@ -35,14 +35,6 @@ body {
   overflow-x: hidden;
 }
 
-/* When the custom cursor is active we hide the system cursor on fine-pointer devices.
-   The class is added by <Cursor> only when it is safe (no touch, motion allowed), so
-   reduced-motion and touch users always keep their native cursor. */
-html.has-custom-cursor,
-html.has-custom-cursor * {
-  cursor: none;
-}
-
 /* Scroll is frozen while the preloader is on screen (Lenis is also stopped in JS). */
 html.is-locked,
 html.is-locked body {
@@ -90,35 +82,6 @@ html.is-locked body {
 .hover-link:hover .hover-link__line--in,
 .hover-link:focus-visible .hover-link__line--in {
   color: var(--accent);
-}
-
-/* ---- Inline media chip (embedded mid-heading, adcker-style) ------------------ */
-@keyframes chip-pulse {
-  0%,
-  100% {
-    opacity: 0.55;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-/* ---- Infinite marquee --------------------------------------------------------
-   Track holds two identical halves; translating -50% loops seamlessly. */
-@keyframes marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-.marquee-track {
-  display: flex;
-  width: max-content;
-  flex-wrap: nowrap;
-  animation: marquee var(--marquee-dur, 32s) linear infinite;
-  will-change: transform;
 }
 
 /* ---- Placeholder media: slow-drifting grain (no gradient) -------------------- */
@@ -182,7 +145,7 @@ html.is-locked body {
   background: #2a2a24;
 }
 
-/* Reduced motion: kill animation/transition entirely and never hide the cursor. */
+/* Reduced motion: kill animation/transition entirely. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -191,9 +154,5 @@ html.is-locked body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
-  }
-  html.has-custom-cursor,
-  html.has-custom-cursor * {
-    cursor: auto;
   }
 }
