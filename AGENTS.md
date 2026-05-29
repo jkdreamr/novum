@@ -43,56 +43,57 @@ Tagline: "Artists building the tools behind their art." Copy is sourced from the
   native scroll (no smoothing to stutter or trap). `scrollToTarget()` / `scrollToTop()` fall
   back to native `scrollIntoView` / `scrollTo` when there's no Lenis instance.
 
+## NO VIDEO — pure typography + motion
+The site has no `<video>` / reel / showreel anywhere (removed in pass 8). The dramatic moment is
+type-driven (see `Statement`).
+
 ## Mobile-visibility guarantees (why the page can't go blank)
-- Preloader has an UNCONDITIONAL hard dismiss (`HARD_DISMISS_MS = 3500`): a mount timeout that
-  always sets `phase='gone'` (unmounts the overlay) + `finish()` (hands off), regardless of
-  rAF/animation. Plus `page.tsx` force-sets `ready` after 4s as a second backstop, so the scroll
-  lock can never persist. The wipe also has a 700ms onAnimationComplete failsafe.
-- `Reveal` can never leave content invisible: it renders plain visible text on SSR/no-JS/first
-  paint/reduced-motion; once mounted it reveals immediately if the element is already in view
-  (rect check — the above-the-fold guarantee), via IntersectionObserver as it scrolls in, and a
-  2.5s catch-all otherwise.
-- `Showreel` only pins/scroll-links on desktop (`min-width:768px` + no-preference); mobile gets a
-  stacked, non-pinned composition. About uses `min-h-[100svh]` (not `vh`). `html`/`body` are
-  `overflow-x:hidden`; the lock is plain `overflow:hidden` (no iOS-finicky height pinning).
-- Consistent page gutter everywhere: `px-6 sm:px-10 lg:px-16` (24/40/64px). Nav, all sections,
-  and the footer share it so headlines + labels align to one left margin.
-- EXACTLY three sections: `components/sections/{About,Team,Join}`. About = hero only — a PURE
-  TYPE headline (no media embedded), flush left, framed by small mono labels. Team = condensed
-  Joshua + Anna rows with a click-to-expand accordion (one open at a time, keyboard-accessible
-  buttons w/ aria-expanded/aria-controls). Join = statement + four ways in + Apply + styled email
-  + closing line. `Showreel` is a transition (not a section) between About and Team.
+- Preloader has an UNCONDITIONAL hard dismiss (`HARD_DISMISS_MS = 5500`): a mount timeout that
+  always sets `phase='gone'` (unmounts overlay) + `finish()` (hands off), regardless of
+  rAF/animation. `page.tsx` also force-sets `ready` after 6s as a second backstop, so the scroll
+  lock can never persist. The wipe has a 700ms onAnimationComplete failsafe too.
+- `Reveal` can never leave content invisible: plain visible text on SSR/no-JS/first
+  paint/reduced-motion; once mounted it reveals immediately if already in view (rect check — the
+  above-the-fold guarantee), via IntersectionObserver as it scrolls in, and a 2.5s catch-all.
+- Pinned/scroll-linked effects (`Statement`) run on DESKTOP only (`min-width:768px` +
+  no-preference); mobile/SSR get a static stacked block. Only `100svh` is used (no `100vh`).
+  `html`/`body` are `overflow-x:hidden`; the lock is plain `overflow:hidden`.
+- Lenis is desktop-only (bails on `pointer: coarse` and reduced-motion) → native touch scroll.
+
+## Layout + sections
+- Consistent page gutter everywhere: `px-6 sm:px-10 lg:px-16` (24/40/64px).
+- EXACTLY three sections: `components/sections/{About,Team,Join}`. About = hero only (pure-type
+  headline, clip-mask line reveals). Team = condensed Joshua + Anna rows w/ click-to-expand
+  accordion. Join = statement + four ways in + Apply + styled email + closing line. `Statement`
+  is a transition (not a section) between About and Team.
 - Components: `Preloader`, `Nav`, `HoverLink` (doubled-text reveal; a/button/span), `Reveal`,
-  `ReelVideo` (shared reel element), `Showreel` (type+video composition), `Footer`.
-- `Preloader`: oversized mono counter pinned bottom-left ticking 00→100; a center word that
-  cycles MUSIC → VISUALS → PERFORMANCE → SYSTEMS → SOUND → NOVUM with EACH word in a DIFFERENT
-  typeface (mono / serif / condensed / extended / italic-contrast), landing on NOVUM in the
-  display face; then a fast wipe-up (~2s, once per session). Reduced-motion skips it;
-  onAnimationComplete + 1s failsafe always lift the overlay.
-- `Showreel` (the video moment) is composed WITH big type, never a bare screen. Desktop +
-  motion-OK → a pinned, scroll-LINKED expand (`useScroll`/`useTransform`, raw): the reel grows
-  from a small jewel toward full-bleed while the "BUILD THE NEW MEDIUM" headline parallaxes past
-  via mix-blend-difference. Mobile / reduced-motion / SSR → a stacked composition (headline +
-  framed reel) that reveals on scroll, no pinning (smooth on phones). Switch is mount-detected
-  via matchMedia `(min-width:768px) and (prefers-reduced-motion:no-preference)`.
-- Video: `public/novum-reel.mp4` (~1.4MB), via `ReelVideo` in `Showreel` only. muted / loop /
-  playsInline / autoPlay / `preload="metadata"` (iOS inline) / no controls; autoplay off under
-  reduced-motion. `poster="/novum-reel-poster.jpg"` is referenced — ADD that file (not in repo
-  yet); meanwhile the first frame + solid bg are the fallback.
-- `Reveal` is safe by construction: plain VISIBLE text on server / no-JS / first paint /
-  reduced-motion, then (after mount, before paint) an animated version that starts hidden and
-  reveals when its OWN element enters view (IntersectionObserver, `rootMargin -10%` so it fires
-  as it scrolls in). Hidden state is opacity + a small offset only (never clipped out of view).
-  NOTE: no time-based failsafe — that pre-revealed off-screen content and killed the scroll
-  reveal; the observer is reliable because the element is never clipped.
-- Motion CSS lives in `globals.css`: `.reel-grain` (placeholder media grain) and the
-  `.hover-link` doubled-text mask.
-- All motion respects `prefers-reduced-motion`: no preloader animation, no video autoplay, and
-  `Reveal` renders content statically.
+  `Statement` (the dramatic type beat), `Footer`.
+
+## Preloader (`components/Preloader.tsx`) — timing
+- Counter 0→100 over `COUNT_MS = 4000` (smoothstep, no sprint). The center word cycles every
+  `WORD_MS = 580` through MUSIC/VISUALS/PERFORMANCE/SYSTEMS/SOUND, EACH in a different typeface
+  (mono/serif/condensed/extended/italic-contrast), decoupled from the counter so each is readable.
+  On 100 it lands on NOVUM (display face), holds `HOLD_MS = 550`, then wipes (0.55s). Once per
+  session; reduced-motion skips; hard dismiss `HARD_DISMISS_MS = 5500`.
+
+## Statement (`components/Statement.tsx`) — the dramatic scroll moment
+- Desktop + motion-OK → a pinned, scroll-LINKED beat (`useScroll`/`useTransform`, raw): the
+  palette inverts ink↔bone, a giant "THE NEXT / LABEL IS / A LAB." zooms toward the viewer
+  (`scale 0.55→1→1.6`), and faint oversized words drift horizontally in opposite directions for
+  depth. Track is `h-[170vh]` and the animation spans the full pin so it hands straight off to
+  Team with NO dead gap (the palette returns to ink by the end). Mobile / reduced-motion / SSR →
+  a static bone-on-ink contrast block (palette-flip beat) with a clip-mask reveal, no pinning.
+
+## Reveal (`components/Reveal.tsx`)
+- `mask` = clip-mask line rise: an overflow-hidden outer frame (which carries the ref/observer,
+  so it's never clipped out of view) with the content riding up inside it. `rise`/`clip`/`fade`
+  are flat opacity + offset/scale. All reveal via the rect-check + observer + 2.5s catch-all
+  above, so they animate on scroll yet can never stay hidden.
+- Other motion CSS in `globals.css`: `.reel-grain` (a grain texture reused by Team's placeholder
+  blocks — not video) and the `.hover-link` doubled-text mask.
+- All motion respects `prefers-reduced-motion` (static, fully visible).
 
 ## Placeholders to replace (search "PLACEHOLDER")
-- `public/novum-reel-poster.jpg` — NOT in the repo yet; `Showreel` references it as the video
-  poster. Add a still (e.g. a frame of the reel) so the poster/fallback shows before play.
 - Team thumbnails + expanded images (`components/sections/Team.tsx`) — swap grain blocks for
   real photos.
 - Join email capture is styled-only (non-functional) — wire to an endpoint to enable.

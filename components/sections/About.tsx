@@ -16,13 +16,13 @@ export default function About() {
 
         {/* HERO HEADLINE — pure type, flush left, three deliberate lines. */}
         <h1 className="font-display font-medium uppercase leading-[0.95] tracking-[-0.04em] text-bone text-[clamp(2rem,8.5vw,8rem)]">
-          <Reveal variant="rise" duration={0.7}>
+          <Reveal variant="mask" duration={0.8}>
             <span className="block">ARTISTS BUILDING</span>
           </Reveal>
-          <Reveal variant="rise" delay={0.07} duration={0.7}>
+          <Reveal variant="mask" delay={0.1} duration={0.8}>
             <span className="block">THE TOOLS BEHIND</span>
           </Reveal>
-          <Reveal variant="rise" delay={0.14} duration={0.7}>
+          <Reveal variant="mask" delay={0.2} duration={0.8}>
             <span className="block">THEIR ART.</span>
           </Reveal>
         </h1>

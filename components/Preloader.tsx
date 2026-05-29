@@ -3,24 +3,29 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
-// Each frame renders the word in a DIFFERENT typeface so the type itself shapeshifts as the
-// counter climbs, landing on NOVUM in the primary display face.
-type Frame = { word: string; font: string; italic?: boolean; final?: boolean };
-const SEQUENCE: Frame[] = [
+// Discipline words cycle on their own timer, EACH in a different typeface (the shapeshift), then
+// it lands on NOVUM in the primary display face.
+type Frame = { word: string; font: string; italic?: boolean };
+const DISCIPLINES: Frame[] = [
   { word: 'MUSIC', font: 'var(--font-mono)' },
   { word: 'VISUALS', font: 'var(--font-serif)' },
   { word: 'PERFORMANCE', font: 'var(--font-condensed)' },
   { word: 'SYSTEMS', font: 'var(--font-extended)' },
   { word: 'SOUND', font: 'var(--font-contrast)', italic: true },
-  { word: 'NOVUM', font: 'var(--font-display)', final: true },
 ];
-const COUNT_MS = 1600; // 0 → 100
-const HARD_DISMISS_MS = 3500; // absolute backstop: the overlay can NEVER trap the page past this
+const FINAL: Frame = { word: 'NOVUM', font: 'var(--font-display)' };
+
+const COUNT_MS = 4000; // 0 → 100, deliberate (eased, no sprint)
+const WORD_MS = 580; // each word readable before it changes
+const HOLD_MS = 550; // hold on NOVUM before the wipe
+const HARD_DISMISS_MS = 5500; // absolute backstop — can never trap the page
 
 type Phase = 'idle' | 'counting' | 'wiping' | 'gone';
 
 export default function Preloader({ onComplete }: { onComplete: () => void }) {
   const [count, setCount] = useState(0);
+  const [wordIdx, setWordIdx] = useState(0);
+  const [final, setFinal] = useState(false);
   const [phase, setPhase] = useState<Phase>('idle');
   const called = useRef(false);
 
@@ -35,9 +40,7 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
     onComplete();
   };
 
-  // Hard, UNCONDITIONAL dismiss. Runs no matter what (rAF throttled, animation stalled, error):
-  // after the backstop the overlay unmounts and the page is handed off. This is the guarantee
-  // that the preloader can never leave a blank screen on mobile.
+  // UNCONDITIONAL hard dismiss — runs no matter what (throttled rAF, stalled animation, error).
   useEffect(() => {
     const hard = window.setTimeout(() => {
       setPhase('gone');
@@ -64,19 +67,27 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
     setPhase('counting');
     const start = performance.now();
     let raf = 0;
+    let wordInterval = 0;
     const tick = (now: number) => {
       const t = Math.min(1, (now - start) / COUNT_MS);
-      const eased = 1 - Math.pow(1 - t, 3);
+      const eased = t * t * (3 - 2 * t); // smoothstep — steady, no sprint
       setCount(Math.round(eased * 100));
       if (t < 1) {
         raf = requestAnimationFrame(tick);
       } else {
         setCount(100);
-        window.setTimeout(() => setPhase('wiping'), 300);
+        setFinal(true);
+        window.clearInterval(wordInterval);
+        window.setTimeout(() => setPhase('wiping'), HOLD_MS);
       }
     };
     raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    wordInterval = window.setInterval(() => setWordIdx((i) => i + 1), WORD_MS);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.clearInterval(wordInterval);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -93,8 +104,8 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
 
   if (phase === 'gone') return null;
 
-  const idx = Math.min(SEQUENCE.length - 1, Math.floor((count / 100) * SEQUENCE.length));
-  const frame = SEQUENCE[idx];
+  const frame = final ? FINAL : DISCIPLINES[wordIdx % DISCIPLINES.length];
+  const displayKey = final ? 'final' : `w${wordIdx}`;
   const wordStyle: CSSProperties = {
     fontFamily: frame.font,
     fontStyle: frame.italic ? 'italic' : 'normal',
@@ -106,7 +117,7 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
       className="fixed inset-0 z-[9995] overflow-hidden bg-ink"
       initial={{ y: 0 }}
       animate={phase === 'wiping' ? { y: '-100%' } : { y: 0 }}
-      transition={{ duration: 0.6, ease: [0.76, 0, 0.24, 1] }}
+      transition={{ duration: 0.55, ease: [0.76, 0, 0.24, 1] }}
       onAnimationComplete={() => {
         if (phase === 'wiping') {
           setPhase('gone');
@@ -114,7 +125,6 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
         }
       }}
     >
-      {/* Composed corner labels */}
       <span className="absolute left-6 top-6 text-[0.7rem] uppercase tracking-label text-bone/45 sm:left-10 sm:top-8 lg:left-16">
         ( NOVUM )
       </span>
@@ -126,14 +136,14 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
       <div className="absolute inset-0 flex items-center justify-center px-6">
         <AnimatePresence>
           <motion.span
-            key={frame.word}
+            key={displayKey}
             style={wordStyle}
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
+            exit={{ opacity: 0, y: -14 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             className={
-              frame.final
+              final
                 ? 'absolute font-medium uppercase leading-none tracking-[-0.04em] text-bone text-[clamp(3.5rem,16vw,12rem)]'
                 : 'absolute uppercase leading-none tracking-[0.02em] text-bone text-[clamp(1.75rem,6vw,3.5rem)]'
             }
@@ -151,7 +161,6 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
         <span className="mb-[0.6em] ml-2 font-mono text-sm text-bone/50">%</span>
       </div>
 
-      {/* Bottom-right marker */}
       <span className="absolute bottom-[clamp(1.25rem,4vw,3rem)] right-6 text-[0.7rem] uppercase tracking-label text-bone/45 sm:right-10 lg:right-16">
         ( EST. 2026 )
       </span>
