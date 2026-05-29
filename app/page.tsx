@@ -1,95 +1,49 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
-import dynamic from 'next/dynamic';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useLenis } from '@/components/providers/SmoothScrollProvider';
-import HeroSection from '@/components/hero/HeroSection';
-import AboutSection from '@/components/about/AboutSection';
-import TeamSection from '@/components/team/TeamSection';
-import JoinSection from '@/components/join/JoinSection';
-import Footer from '@/components/shared/Footer';
 
-const IntroSequence = dynamic(() => import('@/components/intro/IntroSequence'), { ssr: false });
+import { useEffect, useState } from 'react';
+import { useLenis, getLenis } from '@/hooks/useLenis';
+import Preloader from '@/components/Preloader';
+import Cursor from '@/components/Cursor';
+import Nav from '@/components/Nav';
+import About from '@/components/sections/About';
+import Artists from '@/components/sections/Artists';
+import Join from '@/components/sections/Join';
+import Footer from '@/components/Footer';
 
-type Stage = 'boot' | 'intro' | 'ready';
+export default function Page() {
+  useLenis();
+  const [ready, setReady] = useState(false);
 
-export default function Home() {
-  const [stage, setStage] = useState<Stage>('boot');
-  const [showCover, setShowCover] = useState(true);
-  const coverRef = useRef<HTMLDivElement>(null);
-  const lenis = useLenis();
-
-  // Decide — once per session — whether to play the intro.
+  // Always start at the top on a fresh load so the preloader reveals the hero, not a
+  // restored scroll position.
   useEffect(() => {
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
     window.scrollTo(0, 0);
-    gsap.registerPlugin(ScrollTrigger);
-
-    const seen = sessionStorage.getItem('novum_intro_seen');
-    if (seen) {
-      const cover = coverRef.current;
-      if (cover) {
-        gsap.to(cover, {
-          opacity: 0,
-          duration: 0.7,
-          ease: 'power2.out',
-          onComplete: () => {
-            setShowCover(false);
-            setStage('ready');
-            ScrollTrigger.refresh();
-          },
-        });
-      } else {
-        setShowCover(false);
-        setStage('ready');
-      }
-    } else {
-      setStage('intro');
-    }
   }, []);
 
-  // Safety net: never let a stalled intro trap the page behind the cover.
+  // Lock scrolling (class + Lenis) until the preloader hands off.
   useEffect(() => {
-    if (stage !== 'intro') return;
-    const id = setTimeout(() => {
-      setShowCover(false);
-      setStage('ready');
-      ScrollTrigger.refresh();
-    }, 9000);
-    return () => clearTimeout(id);
-  }, [stage]);
-
-  // Lock scrolling until the page is ready to explore.
-  useEffect(() => {
-    const locked = stage !== 'ready';
-    document.documentElement.classList.toggle('intro-lock', locked);
-    if (locked) lenis?.stop();
-    else lenis?.start();
-    return () => { document.documentElement.classList.remove('intro-lock'); };
-  }, [stage, lenis]);
-
-  const handleIntroComplete = () => {
-    setStage('ready');
-    // Recompute scroll positions once the layout has settled (intro overlay gone).
-    requestAnimationFrame(() => requestAnimationFrame(() => ScrollTrigger.refresh()));
-  };
+    const root = document.documentElement;
+    if (ready) {
+      root.classList.remove('is-locked');
+      getLenis()?.start();
+    } else {
+      root.classList.add('is-locked');
+      getLenis()?.stop();
+    }
+  }, [ready]);
 
   return (
     <>
+      <Preloader onComplete={() => setReady(true)} />
+      <Cursor />
+      <Nav />
       <main>
-        <HeroSection />
-        <AboutSection />
-        <TeamSection />
-        <JoinSection />
-        <Footer />
+        <About />
+        <Artists />
+        <Join />
       </main>
-
-      {/* Server-rendered black cover prevents any flash of content before the intro decides. */}
-      {showCover && <div ref={coverRef} className="boot-cover" aria-hidden />}
-
-      {stage === 'intro' && (
-        <IntroSequence onReady={() => setShowCover(false)} onComplete={handleIntroComplete} />
-      )}
+      <Footer />
     </>
   );
 }

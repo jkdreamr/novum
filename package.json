@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node scripts/subset-font.mjs && next dev",
-    "build": "node scripts/subset-font.mjs && next build",
+    "dev": "next dev",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -12,22 +12,14 @@
     "next": "14.2.5",
     "react": "^18",
     "react-dom": "^18",
-    "three": "0.165.0",
-    "@react-three/fiber": "8.16.8",
-    "@react-three/drei": "9.105.0",
-    "gsap": "3.12.5",
     "lenis": "1.1.14",
-    "framer-motion": "11.3.19",
-    "react-hook-form": "7.52.1",
-    "zod": "3.23.8",
-    "@hookform/resolvers": "3.9.0"
+    "framer-motion": "11.3.19"
   },
   "devDependencies": {
     "typescript": "^5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "@types/three": "0.165.0",
     "tailwindcss": "^3.4.1",
     "postcss": "^8",
     "autoprefixer": "^10.0.1",

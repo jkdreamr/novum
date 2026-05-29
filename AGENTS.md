@@ -1,42 +1,51 @@
-# Novum — Project Notes
+# NOVUM — Project Notes
+
+NOVUM is a single-page editorial site for a collective of artists who build the tools they
+create with. Minimal, mono-flavored, oversized-serif typography; adcker-style preloader,
+doubled-text hover links, custom cursor, and smooth scroll.
 
 ## Stack
-- Next.js 14.2.5, TypeScript, Tailwind CSS
-- Three.js 0.165.0 + @react-three/fiber 8.16.8 + @react-three/drei 9.105.0
-- GSAP 3.12.5 (ScrollTrigger)
-- lenis 1.1.14 (smooth scroll — NOTE: use `lenis` not `@studio-freight/lenis`)
-- react-hook-form 7.52.1 + zod 3.23.8
+- Next.js 14.2.5 (App Router), TypeScript, Tailwind CSS
+- `lenis` 1.1.14 — smooth scroll (NOTE: package is `lenis`, not `@studio-freight/lenis`)
+- `framer-motion` 11.3.19 — reveal/mask animations + custom cursor spring
+- No backend, no 3D, no GSAP. The page is static / SSG-friendly.
 
 ## Package manager
-Use `~/.local/bin/pnpm` (pnpm 9.15.0 installed locally — system pnpm is broken via corepack)
+`pnpm` (v10.x) is on PATH at `/opt/node22/bin/pnpm`.
 
 ## Commands
-- Dev: `~/.local/bin/pnpm dev`
-- Build: `~/.local/bin/pnpm build`
-- Install: `~/.local/bin/pnpm install`
+- Dev: `pnpm dev`
+- Build: `pnpm build`
+- Lint: `pnpm lint`
 
-## Font note
-Cormorant Garamond via next/font/google supports weights: 300, 400, 500 (we load 300/400/500).
-`next/font` only exposes the loaded face through the CSS variable `--font-cormorant`, so
-`--font-display` in `globals.css` references `var(--font-cormorant)` (NOT the literal family name,
-which would silently fall back to Georgia). Display headings use weight 300 (the lightest loaded).
+## Fonts (next/font/google — no external CSS @import)
+- Display: **Instrument Serif** (400 + italic) → CSS var `--font-display`, Tailwind `font-display`.
+- Mono: **Space Mono** (400/700 + italic) → CSS var `--font-mono`, Tailwind `font-mono`.
+- Body default font is the mono; big editorial headings use `font-display`.
+- Wired in `lib/fonts.ts`, applied on `<html>` in `app/layout.tsx`.
+- `next/font` fetches the faces at build time and self-hosts them (needs network during build).
 
-## 3D assets / rendering notes
-- `public/fonts/serif_regular.typeface.json` — Three.js typeface JSON (Droid Serif). `GlassTextScene`
-  uses `Text3D` + `MeshTransmissionMaterial` for real extruded glass letterforms.
-- `public/models/bust.glb` — optional. Drop a CC0 GLB bust here and set `BUST_MODEL_URL` in
-  `PhilosopherScene.tsx` to `/models/bust.glb`. By default an elegant sculptural fallback renders
-  (no network 404 for a missing file).
-- drei `Environment preset="..."` is NOT used — its HDRI CDN is blocked by the network policy.
-  All scenes build lighting from `<Environment><Lightformer/></Environment>` (no runtime fetch).
-- All WebGL scenes are wrapped in `ErrorBoundary` so a GPU/context failure can never white-screen the page.
+## Design tokens (`tailwind.config.ts`)
+- Colors: `ink` #0A0A0A (bg), `bone` #EDE8DF (text), `accent` #C8FF5E (faded acid-lime, used
+  sparingly — hover ticks + the inline media chip border).
+- `tracking-label` = 0.18em for small uppercase labels; `ease-editorial` shared easing.
 
-## Intro / scroll flow
-- `app/page.tsx` runs a `boot → intro → ready` state machine. A server-rendered `.boot-cover`
-  prevents content flash; scrolling is locked (`html.intro-lock` + Lenis `stop()`) until `ready`.
-- `ScrollTrigger.refresh()` is called once the intro overlay unmounts so scroll positions are correct.
-- Lenis instance is exposed via `useLenis()` from `SmoothScrollProvider`.
+## Architecture
+- `app/page.tsx` (client) is the orchestrator: inits Lenis via `useLenis()`, renders the
+  Preloader/Cursor/Nav/sections/Footer, and locks scroll (`html.is-locked` + Lenis stop)
+  until the preloader hands off.
+- `hooks/useLenis.ts` keeps a single shared Lenis instance; `scrollToTarget()` / `scrollToTop()`
+  let nav + back-to-top drive it (with a native-scroll fallback under reduced motion).
+- Components: `Preloader`, `Cursor`, `Nav`, `HoverLink` (doubled-text reveal), `Reveal`
+  (whileInView mask/clip/rise), `Footer`, and `components/sections/{About,Artists,Join}`.
+- All motion respects `prefers-reduced-motion`: no custom cursor, no preloader animation, and
+  `Reveal` renders content statically.
+
+## Placeholders to replace (search "PLACEHOLDER")
+- About inline media chip (`components/sections/About.tsx`) — swap for real video/image.
+- Artist images (`components/sections/Artists.tsx`) — swap framed blocks for real `<Image>`.
+- Join email capture is styled-only (non-functional) — wire to an endpoint to enable.
+- Addresses: `join@novum.studio` (Join), `hello@novum.studio` + Instagram `#` (Footer).
 
 ## Deployment
-- `vercel.json` is at project root
-- Add `RESEND_API_KEY` to Vercel env vars when wiring email in `app/api/join/route.ts`
+- `vercel.json` at repo root (framework nextjs, pnpm build/dev/install). No env vars required.

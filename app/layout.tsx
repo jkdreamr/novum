@@ -1,30 +1,20 @@
-import type { Metadata } from 'next';
-import { cormorant } from '@/lib/fonts';
-import { SmoothScrollProvider } from '@/components/providers/SmoothScrollProvider';
-import { GSAPProvider } from '@/components/providers/GSAPProvider';
+import type { Metadata, Viewport } from 'next';
+import { instrumentSerif, spaceMono } from '@/lib/fonts';
 import '@/app/globals.css';
 
 export const metadata: Metadata = {
-  title: 'Novum — A Creative Collective',
-  description: 'A collective for art, thought, and vision.',
+  title: 'NOVUM',
+  description: 'A collective of artists who build the tools they create with.',
+};
+
+export const viewport: Viewport = {
+  themeColor: '#0A0A0A',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={cormorant.variable}>
-      <head>
-        <link
-          href="https://api.fontshare.com/v2/css?f[]=neue-montreal@300,400,500&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body>
-        <GSAPProvider>
-          <SmoothScrollProvider>
-            {children}
-          </SmoothScrollProvider>
-        </GSAPProvider>
-      </body>
+    <html lang="en" className={`${instrumentSerif.variable} ${spaceMono.variable}`}>
+      <body>{children}</body>
     </html>
   );
 }
