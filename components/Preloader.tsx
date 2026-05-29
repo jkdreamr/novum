@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 
-const FRAMES = [0, 1, 2, 3, 4]; // placeholder image frames that cross-fade center-screen
+// Words cross-fading center-screen as the count climbs (the deck's mediums + identity).
+const WORDS = ['MUSIC', 'VISUALS', 'PERFORMANCE', 'SYSTEMS', 'NOVUM'];
 const COUNT_MS = 2200; // duration of the 0 → 100 count
 
 type Phase = 'idle' | 'counting' | 'wiping' | 'gone';
@@ -67,7 +68,7 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
 
   if (phase === 'gone') return null;
 
-  const activeFrame = Math.min(FRAMES.length - 1, Math.floor((count / 100) * FRAMES.length));
+  const activeWord = Math.min(WORDS.length - 1, Math.floor((count / 100) * WORDS.length));
 
   return (
     <motion.div
@@ -83,21 +84,16 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
         }
       }}
     >
-      {/* Center frame stack — placeholder blocks cross-fading as the count climbs. */}
-      <div className="relative h-[34vmin] w-[34vmin] max-h-[280px] max-w-[280px]">
-        {FRAMES.map((f, i) => (
-          <div
-            key={f}
-            className="absolute inset-0 flex items-center justify-center border border-bone/15 transition-opacity duration-500"
-            style={{
-              opacity: i === activeFrame ? 1 : 0,
-              background: i % 2 ? 'rgba(237,232,223,0.06)' : 'transparent',
-            }}
+      {/* Center word stack — cross-fading as the count climbs. */}
+      <div className="relative flex h-[30vmin] w-full items-center justify-center px-6">
+        {WORDS.map((w, i) => (
+          <span
+            key={w}
+            className="absolute font-display text-[clamp(2rem,10vw,7rem)] font-medium uppercase tracking-[-0.03em] text-bone transition-opacity duration-500"
+            style={{ opacity: i === activeWord ? 1 : 0 }}
           >
-            <span className="font-mono text-[0.7rem] uppercase tracking-label text-bone/35">
-              ( {String(f + 1).padStart(2, '0')} )
-            </span>
-          </div>
+            {w}
+          </span>
         ))}
       </div>
 

@@ -2,6 +2,7 @@
 
 import { type MouseEvent } from 'react';
 import HoverLink from '@/components/HoverLink';
+import Marquee from '@/components/Marquee';
 import { scrollToTarget, scrollToTop } from '@/hooks/useLenis';
 
 const INDEX = [
@@ -18,9 +19,9 @@ export default function Footer() {
 
   return (
     <footer className="px-5 pb-8 pt-[clamp(4rem,10vw,8rem)] sm:px-8">
-      <div className="grid grid-cols-2 gap-10 sm:grid-cols-3">
+      <div className="grid grid-cols-2 gap-10 sm:grid-cols-12">
         {/* Index */}
-        <nav aria-label="Sections" className="flex flex-col items-start gap-3">
+        <nav aria-label="Sections" className="flex flex-col items-start gap-3 sm:col-span-3">
           <span className="mb-2 text-[0.7rem] uppercase tracking-label text-bone/40">( Index )</span>
           {INDEX.map((l) => (
             <HoverLink
@@ -35,10 +36,10 @@ export default function Footer() {
         </nav>
 
         {/* Reach out */}
-        <div className="flex flex-col items-start gap-3">
+        <div className="flex flex-col items-start gap-3 sm:col-span-3">
           <span className="mb-2 text-[0.7rem] uppercase tracking-label text-bone/40">( Reach out )</span>
-          {/* PLACEHOLDER contacts — replace with the real address + handle. */}
-          <HoverLink href="mailto:hello@novum.studio" className="text-sm uppercase tracking-label">
+          {/* PLACEHOLDER contacts — confirm/replace the address + handle. */}
+          <HoverLink href="mailto:hello@novum.example" className="text-sm uppercase tracking-label">
             Email
           </HoverLink>
           <HoverLink
@@ -49,13 +50,21 @@ export default function Footer() {
             Instagram
           </HoverLink>
         </div>
+
+        {/* Identity */}
+        <div className="col-span-2 flex flex-col items-start gap-2 text-[0.7rem] uppercase tracking-label text-bone/45 sm:col-span-6 sm:items-end sm:text-right">
+          <span>Artists building the tools behind their art.</span>
+          <span>( EST. 2026 · KOREA ↔ SF )</span>
+        </div>
       </div>
 
-      {/* Oversized editorial sign-off wordmark */}
-      <div className="mt-[clamp(3rem,8vw,6rem)] select-none">
-        <span className="block font-display uppercase leading-[0.8] tracking-[-0.02em] text-[clamp(4rem,21vw,17rem)] text-bone">
-          NOVUM
-        </span>
+      {/* Oversized sign-off — slow marquee */}
+      <div className="mt-[clamp(3rem,8vw,6rem)]">
+        <Marquee
+          text="NOVUM · "
+          durationSec={48}
+          className="font-display text-[clamp(4rem,18vw,15rem)] font-medium uppercase leading-[0.85] tracking-[-0.03em] text-bone"
+        />
       </div>
 
       {/* Bottom row */}

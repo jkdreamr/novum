@@ -5,6 +5,7 @@ import { useLenis, getLenis } from '@/hooks/useLenis';
 import Preloader from '@/components/Preloader';
 import Cursor from '@/components/Cursor';
 import Nav from '@/components/Nav';
+import Marquee from '@/components/Marquee';
 import About from '@/components/sections/About';
 import Artists from '@/components/sections/Artists';
 import Join from '@/components/sections/Join';
@@ -40,6 +41,11 @@ export default function Page() {
       <Nav />
       <main>
         <About />
+        <Marquee
+          text="BUILD THE NEW MEDIUM · THE ARTIST IS THE STUDIO · TOOLS BECOME THE PLATFORM · CULTURE COMPOUNDS · "
+          durationSec={28}
+          className="border-y border-bone/15 py-5 font-display text-[clamp(1.75rem,6vw,4.5rem)] font-medium uppercase tracking-[-0.02em] text-bone"
+        />
         <Artists />
         <Join />
       </main>

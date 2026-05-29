@@ -1,8 +1,9 @@
 # NOVUM — Project Notes
 
-NOVUM is a single-page editorial site for a collective of artists who build the tools they
-create with. Minimal, mono-flavored, oversized-serif typography; adcker-style preloader,
-doubled-text hover links, custom cursor, and smooth scroll.
+NOVUM is a single-page editorial site for a label/collective/creative-lab of artists building
+the tools behind their art. Dense, mono-flavored, oversized grotesque typography; adcker-style
+preloader, doubled-text hover links, contextual custom cursor, marquees, and smooth scroll.
+Tagline: "Artists building the tools behind their art." Copy is sourced from the official deck.
 
 ## Stack
 - Next.js 14.2.5 (App Router), TypeScript, Tailwind CSS
@@ -19,7 +20,8 @@ doubled-text hover links, custom cursor, and smooth scroll.
 - Lint: `pnpm lint`
 
 ## Fonts (next/font/google — no external CSS @import)
-- Display: **Instrument Serif** (400 + italic) → CSS var `--font-display`, Tailwind `font-display`.
+- Display: **Space Grotesk** (variable, weights 300–700) → CSS var `--font-display`, Tailwind
+  `font-display`. Big headings use `font-medium` (500).
 - Mono: **Space Mono** (400/700 + italic) → CSS var `--font-mono`, Tailwind `font-mono`.
 - Body default font is the mono; big editorial headings use `font-display`.
 - Wired in `lib/fonts.ts`, applied on `<html>` in `app/layout.tsx`.
@@ -36,16 +38,23 @@ doubled-text hover links, custom cursor, and smooth scroll.
   until the preloader hands off.
 - `hooks/useLenis.ts` keeps a single shared Lenis instance; `scrollToTarget()` / `scrollToTop()`
   let nav + back-to-top drive it (with a native-scroll fallback under reduced motion).
-- Components: `Preloader`, `Cursor`, `Nav`, `HoverLink` (doubled-text reveal), `Reveal`
-  (whileInView mask/clip/rise), `Footer`, and `components/sections/{About,Artists,Join}`.
-- All motion respects `prefers-reduced-motion`: no custom cursor, no preloader animation, and
-  `Reveal` renders content statically.
+- Components: `Preloader` (counter + cross-fading words + wipe), `Cursor` (spring dot +
+  contextual label bubble from `data-cursor` value, e.g. "VIEW"/"APPLY"/"PLAY"), `Nav`,
+  `HoverLink` (doubled-text reveal; renders a/button/span), `Reveal` (whileInView
+  mask/clip/rise), `Marquee` (seamless infinite loop), `Footer`, and
+  `components/sections/{About,Artists,Join}`.
+- Motion CSS lives in `globals.css`: `.marquee-track`, `.reel-grain` (drifting showreel grain),
+  `.scroll-arrow`, `chip-pulse`, and the `.hover-link` doubled-text mask.
+- All motion respects `prefers-reduced-motion`: no custom cursor, no preloader animation,
+  marquees freeze, and `Reveal` renders content statically.
 
 ## Placeholders to replace (search "PLACEHOLDER")
 - About inline media chip (`components/sections/About.tsx`) — swap for real video/image.
+- Showreel panel (`components/sections/About.tsx`) — drifting-grain block; drop in a muted
+  looping `<video autoPlay muted loop playsInline>` (snippet in a comment there).
 - Artist images (`components/sections/Artists.tsx`) — swap framed blocks for real `<Image>`.
 - Join email capture is styled-only (non-functional) — wire to an endpoint to enable.
-- Addresses: `join@novum.studio` (Join), `hello@novum.studio` + Instagram `#` (Footer).
+- Address: `hello@novum.example` (Join Apply + Footer Email); Instagram `#` (Footer).
 
 ## Deployment
 - `vercel.json` at repo root (framework nextjs, pnpm build/dev/install). No env vars required.

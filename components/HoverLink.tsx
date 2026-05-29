@@ -1,6 +1,6 @@
 'use client';
 
-import type { MouseEvent, ReactNode } from 'react';
+import type { MouseEvent } from 'react';
 
 type HoverLinkProps = {
   /** The visible label. Kept as a string so we can duplicate it for the mask reveal. */
@@ -11,12 +11,15 @@ type HoverLinkProps = {
   /** Render an external anchor (adds target + rel). */
   external?: boolean;
   ariaLabel?: string;
+  /** Value written to data-cursor; the custom cursor shows it as a label (e.g. "APPLY"). */
+  cursorLabel?: string;
 };
 
 /**
- * Doubled-text reveal link (adcker-style). Two stacked copies of the label sit in
- * an overflow-hidden mask; on hover/focus the stack slides up so a fresh copy rolls
- * into place. The incoming copy is aria-hidden so assistive tech reads the label once.
+ * Doubled-text reveal link (adcker-style). Two stacked copies of the label sit in an
+ * overflow-hidden mask; on hover/focus the stack slides up so a fresh copy rolls into place.
+ * Renders an <a> when href is set, a <button> when only onClick is set, otherwise a
+ * presentational <span> (so the same hover effect can be used on non-navigating items).
  */
 export default function HoverLink({
   children,
@@ -25,6 +28,7 @@ export default function HoverLink({
   className = '',
   external = false,
   ariaLabel,
+  cursorLabel = 'link',
 }: HoverLinkProps) {
   const inner = (
     <span className="hover-link__mask">
@@ -44,7 +48,7 @@ export default function HoverLink({
         onClick={onClick}
         className={classes}
         aria-label={ariaLabel}
-        data-cursor="link"
+        data-cursor={cursorLabel}
         {...(external ? { target: '_blank', rel: 'noreferrer noopener' } : {})}
       >
         {inner}
@@ -52,15 +56,24 @@ export default function HoverLink({
     );
   }
 
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className={classes}
+        aria-label={ariaLabel}
+        data-cursor={cursorLabel}
+      >
+        {inner}
+      </button>
+    );
+  }
+
+  // Presentational: keeps the hover reveal without being a focusable control.
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={classes}
-      aria-label={ariaLabel}
-      data-cursor="link"
-    >
+    <span className={classes} data-cursor={cursorLabel}>
       {inner}
-    </button>
+    </span>
   );
 }

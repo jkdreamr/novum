@@ -1,11 +1,9 @@
-import { Instrument_Serif, Space_Mono } from 'next/font/google';
+import { Space_Grotesk, Space_Mono } from 'next/font/google';
 
-// Display face for the oversized editorial headings (high-fashion editorial serif).
-// Instrument Serif ships a single weight (400) + italic — exactly what display use wants.
-export const instrumentSerif = Instrument_Serif({
+// Display face for the oversized editorial headings — a tight modern grotesque
+// (adcker / Helvetica-Now register). Loaded as a variable font so 400–700 are all available.
+export const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
-  weight: ['400'],
-  style: ['normal', 'italic'],
   variable: '--font-display',
   display: 'swap',
 });

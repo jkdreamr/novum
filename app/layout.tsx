@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from 'next';
-import { instrumentSerif, spaceMono } from '@/lib/fonts';
+import { spaceGrotesk, spaceMono } from '@/lib/fonts';
 import '@/app/globals.css';
 
 export const metadata: Metadata = {
   title: 'NOVUM',
-  description: 'A collective of artists who build the tools they create with.',
+  description: 'Artists building the tools behind their art.',
 };
 
 export const viewport: Viewport = {
@@ -13,7 +13,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${instrumentSerif.variable} ${spaceMono.variable}`}>
+    <html lang="en" className={`${spaceGrotesk.variable} ${spaceMono.variable}`}>
       <body>{children}</body>
     </html>
   );
