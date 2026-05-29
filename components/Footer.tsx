@@ -2,12 +2,11 @@
 
 import { type MouseEvent } from 'react';
 import HoverLink from '@/components/HoverLink';
-import Marquee from '@/components/Marquee';
 import { scrollToTarget, scrollToTop } from '@/hooks/useLenis';
 
 const INDEX = [
   { label: 'About', target: '#about' },
-  { label: 'Artists', target: '#artists' },
+  { label: 'Team', target: '#team' },
   { label: 'Join', target: '#join' },
 ];
 
@@ -18,10 +17,10 @@ export default function Footer() {
   };
 
   return (
-    <footer className="px-5 pb-8 pt-[clamp(4rem,10vw,8rem)] sm:px-8">
-      <div className="grid grid-cols-2 gap-10 sm:grid-cols-12">
+    <footer className="px-5 pb-8 pt-[clamp(3.5rem,8vw,6rem)] sm:px-8">
+      <div className="flex flex-col gap-10 border-t border-bone/15 pt-10 sm:flex-row sm:justify-between">
         {/* Index */}
-        <nav aria-label="Sections" className="flex flex-col items-start gap-3 sm:col-span-3">
+        <nav aria-label="Sections" className="flex flex-col items-start gap-3">
           <span className="mb-2 text-[0.7rem] uppercase tracking-label text-bone/40">( Index )</span>
           {INDEX.map((l) => (
             <HoverLink
@@ -36,7 +35,7 @@ export default function Footer() {
         </nav>
 
         {/* Reach out */}
-        <div className="flex flex-col items-start gap-3 sm:col-span-3">
+        <div className="flex flex-col items-start gap-3">
           <span className="mb-2 text-[0.7rem] uppercase tracking-label text-bone/40">( Reach out )</span>
           {/* PLACEHOLDER contacts — confirm/replace the address + handle. */}
           <HoverLink href="mailto:hello@novum.example" className="text-sm uppercase tracking-label">
@@ -52,23 +51,14 @@ export default function Footer() {
         </div>
 
         {/* Identity */}
-        <div className="col-span-2 flex flex-col items-start gap-2 text-[0.7rem] uppercase tracking-label text-bone/45 sm:col-span-6 sm:items-end sm:text-right">
-          <span>Artists building the tools behind their art.</span>
+        <div className="flex flex-col items-start gap-2 text-[0.7rem] uppercase tracking-label text-bone/45 sm:items-end sm:text-right">
+          <span>NOVUM — Artists building the tools behind their art.</span>
           <span>( EST. 2026 · KOREA ↔ SF )</span>
         </div>
       </div>
 
-      {/* Oversized sign-off — slow marquee */}
-      <div className="mt-[clamp(3rem,8vw,6rem)]">
-        <Marquee
-          text="NOVUM · "
-          durationSec={48}
-          className="font-display text-[clamp(4rem,18vw,15rem)] font-medium uppercase leading-[0.85] tracking-[-0.03em] text-bone"
-        />
-      </div>
-
       {/* Bottom row */}
-      <div className="mt-8 flex items-center justify-between border-t border-bone/15 pt-6 text-[0.7rem] uppercase tracking-label text-bone/50">
+      <div className="mt-10 flex items-center justify-between border-t border-bone/15 pt-6 text-[0.7rem] uppercase tracking-label text-bone/50">
         <span>© 2026 NOVUM</span>
         <HoverLink
           onClick={(e) => {

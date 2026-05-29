@@ -121,7 +121,7 @@ html.is-locked body {
   will-change: transform;
 }
 
-/* ---- Showreel placeholder: slow-drifting grain (no gradient) ----------------- */
+/* ---- Placeholder media: slow-drifting grain (no gradient) -------------------- */
 @keyframes grain-drift {
   0% {
     background-position: 0 0;

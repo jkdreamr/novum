@@ -38,21 +38,24 @@ Tagline: "Artists building the tools behind their art." Copy is sourced from the
   until the preloader hands off.
 - `hooks/useLenis.ts` keeps a single shared Lenis instance; `scrollToTarget()` / `scrollToTop()`
   let nav + back-to-top drive it (with a native-scroll fallback under reduced motion).
-- Components: `Preloader` (counter + cross-fading words + wipe), `Cursor` (spring dot +
-  contextual label bubble from `data-cursor` value, e.g. "VIEW"/"APPLY"/"PLAY"), `Nav`,
-  `HoverLink` (doubled-text reveal; renders a/button/span), `Reveal` (whileInView
-  mask/clip/rise), `Marquee` (seamless infinite loop), `Footer`, and
-  `components/sections/{About,Artists,Join}`.
-- Motion CSS lives in `globals.css`: `.marquee-track`, `.reel-grain` (drifting showreel grain),
-  `.scroll-arrow`, `chip-pulse`, and the `.hover-link` doubled-text mask.
+- EXACTLY three sections: `components/sections/{About,Team,Join}` (About = hero only; Team =
+  Joshua + Anna rows; Join = statement + four ways in + Apply + styled email + closing line).
+- Components: `Preloader` (counter + cross-fading words + wipe), `Cursor` (small fast-tracking
+  ring, stiff spring, no label bubble), `Nav`, `HoverLink` (doubled-text reveal; renders
+  a/button/span), `Reveal`, `Marquee` (one thin divider between About/Team), `Footer`.
+- `Reveal` is safe by construction: it renders plain VISIBLE text on the server / no-JS / first
+  paint / reduced-motion, then (after mount, before paint) switches to an animated version that
+  starts hidden and reveals when its OWN element scrolls into view. The hidden state is only
+  opacity + a small offset/scale — it NEVER clips itself out of an overflow-hidden ancestor (the
+  old `mask` variant did, which broke the IntersectionObserver and left every heading invisible).
+  A 900ms failsafe guarantees content is shown even if the observer never fires.
+- Motion CSS lives in `globals.css`: `.marquee-track`, `.reel-grain` (placeholder media grain),
+  `.scroll-arrow`, and the `.hover-link` doubled-text mask.
 - All motion respects `prefers-reduced-motion`: no custom cursor, no preloader animation,
-  marquees freeze, and `Reveal` renders content statically.
+  marquee freezes, and `Reveal` renders content statically.
 
 ## Placeholders to replace (search "PLACEHOLDER")
-- About inline media chip (`components/sections/About.tsx`) — swap for real video/image.
-- Showreel panel (`components/sections/About.tsx`) — drifting-grain block; drop in a muted
-  looping `<video autoPlay muted loop playsInline>` (snippet in a comment there).
-- Artist images (`components/sections/Artists.tsx`) — swap framed blocks for real `<Image>`.
+- Team images (`components/sections/Team.tsx`) — swap framed grain blocks for real `<Image>`.
 - Join email capture is styled-only (non-functional) — wire to an endpoint to enable.
 - Address: `hello@novum.example` (Join Apply + Footer Email); Instagram `#` (Footer).
 

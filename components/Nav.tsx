@@ -6,7 +6,7 @@ import { getLenis, scrollToTarget, scrollToTop } from '@/hooks/useLenis';
 
 const LINKS = [
   { label: 'About', target: '#about' },
-  { label: 'Artists', target: '#artists' },
+  { label: 'Team', target: '#team' },
   { label: 'Join', target: '#join' },
 ];
 

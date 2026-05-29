@@ -7,7 +7,7 @@ import Cursor from '@/components/Cursor';
 import Nav from '@/components/Nav';
 import Marquee from '@/components/Marquee';
 import About from '@/components/sections/About';
-import Artists from '@/components/sections/Artists';
+import Team from '@/components/sections/Team';
 import Join from '@/components/sections/Join';
 import Footer from '@/components/Footer';
 
@@ -41,12 +41,13 @@ export default function Page() {
       <Nav />
       <main>
         <About />
+        {/* Single thin marquee divider between sections (pure CSS — cannot get stuck hidden). */}
         <Marquee
-          text="BUILD THE NEW MEDIUM · THE ARTIST IS THE STUDIO · TOOLS BECOME THE PLATFORM · CULTURE COMPOUNDS · "
-          durationSec={28}
-          className="border-y border-bone/15 py-5 font-display text-[clamp(1.75rem,6vw,4.5rem)] font-medium uppercase tracking-[-0.02em] text-bone"
+          text="BUILD THE NEW MEDIUM · MUSIC · VISUALS · PERFORMANCE · SYSTEMS · "
+          durationSec={30}
+          className="border-y border-bone/15 py-4 text-xs uppercase tracking-label text-bone/60"
         />
-        <Artists />
+        <Team />
         <Join />
       </main>
       <Footer />
