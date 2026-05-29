@@ -17,7 +17,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="px-5 pb-8 pt-[clamp(3.5rem,8vw,6rem)] sm:px-8">
+    <footer className="px-6 pb-8 pt-[clamp(3.5rem,8vw,6rem)] sm:px-10 lg:px-16">
       <div className="flex flex-col gap-10 border-t border-bone/15 pt-10 sm:flex-row sm:justify-between">
         {/* Index */}
         <nav aria-label="Sections" className="flex flex-col items-start gap-3">

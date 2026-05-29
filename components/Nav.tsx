@@ -38,7 +38,7 @@ export default function Nav() {
   return (
     <header className="fixed inset-x-0 top-0 z-50">
       <nav
-        className="flex items-center justify-between px-5 py-5 sm:px-8"
+        className="flex items-center justify-between px-6 py-5 sm:px-10 lg:px-16"
         aria-label="Primary"
       >
         {/* Wordmark → back to top */}
@@ -83,7 +83,7 @@ export default function Nav() {
       {open && (
         <div
           id="mobile-menu"
-          className="fixed inset-0 z-40 flex flex-col items-start justify-center gap-3 bg-ink px-5 md:hidden"
+          className="fixed inset-0 z-40 flex flex-col items-start justify-center gap-3 bg-ink px-6 sm:px-10 md:hidden"
         >
           {LINKS.map((l) => (
             <HoverLink

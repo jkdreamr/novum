@@ -38,37 +38,41 @@ Tagline: "Artists building the tools behind their art." Copy is sourced from the
   the preloader hands off. No custom cursor — the native cursor is used everywhere.
 - `hooks/useLenis.ts` keeps a single shared Lenis instance; `scrollToTarget()` / `scrollToTop()`
   let nav + back-to-top drive it (with a native-scroll fallback under reduced motion).
-- EXACTLY three sections: `components/sections/{About,Team,Join}`. About = hero only (huge
-  left-aligned headline with the reel chip embedded after "TOOLS"); Team = condensed Joshua +
-  Anna rows with a click-to-expand accordion (one open at a time, keyboard-accessible buttons
-  with aria-expanded/aria-controls); Join = statement + four ways in + Apply + styled email +
-  closing line. `ScrollExpand` is a transition (not a section) between About and Team.
-- Components: `Preloader` (counter + cross-fading words + wipe), `Nav`, `HoverLink` (doubled-text
-  reveal; renders a/button/span), `Reveal`, `ReelVideo` (the shared reel element), `ScrollExpand`
-  (scroll-linked expand showreel), `Footer`.
-- Video: `public/novum-reel.mp4` (~1.4MB, 1280×720). Played via `ReelVideo` in TWO places — the
-  inline headline chip in About, and the `ScrollExpand` showreel. Always muted/loop/playsInline/
-  autoPlay/preload, no controls; autoplay is disabled under reduced-motion (shows the still first
-  frame). No poster image yet (first frame is used); a solid bg sits behind as the load fallback.
-- `ScrollExpand` uses framer `useScroll`+`useTransform` (raw, no spring) on a pinned sticky stage
-  inside a 230vh track: the reel scales 0.42→1 toward full-bleed as you scroll while the headline
-  drifts past with opposing parallax. Reduced-motion → a static, fully-visible reel.
+- Consistent page gutter everywhere: `px-6 sm:px-10 lg:px-16` (24/40/64px). Nav, all sections,
+  and the footer share it so headlines + labels align to one left margin. The `Showreel` video
+  is a deliberate full-bleed exception (its caption row keeps the gutter).
+- EXACTLY three sections: `components/sections/{About,Team,Join}`. About = hero only — a PURE
+  TYPE headline (no media embedded), flush left, framed by small mono labels. Team = condensed
+  Joshua + Anna rows with a click-to-expand accordion (one open at a time, keyboard-accessible
+  buttons w/ aria-expanded/aria-controls). Join = statement + four ways in + Apply + styled email
+  + closing line. `Showreel` is a transition (not a section) between About and Team.
+- Components: `Preloader`, `Nav`, `HoverLink` (doubled-text reveal; a/button/span), `Reveal`,
+  `ReelVideo` (shared reel element), `Showreel` (clean full-bleed reel), `Footer`.
+- `Preloader`: oversized mono counter pinned bottom-left ticking 00→100, a center word sequence
+  (MUSIC → VISUALS → PERFORMANCE → SYSTEMS in mono, then a big display-face NOVUM as the finale),
+  then a fast wipe-up reveal (~2s total, once per session). Reduced-motion skips it. An
+  onAnimationComplete + 1s failsafe guarantee the overlay always lifts.
+- Video: `public/novum-reel.mp4` (~1.4MB, 1280×720), played via `ReelVideo` ONLY in `Showreel` —
+  a clean full-bleed band with the caption ABOVE it (never text over the footage). Always
+  muted/loop/playsInline/autoPlay/preload, no controls; autoplay disabled under reduced-motion.
+  `poster="/novum-reel-poster.jpg"` is referenced — ADD that file (not yet in repo); until then
+  the video's first frame + the solid bg behind act as the fallback.
 - `Reveal` is safe by construction: it renders plain VISIBLE text on the server / no-JS / first
   paint / reduced-motion, then (after mount, before paint) switches to an animated version that
   starts hidden and reveals when its OWN element scrolls into view. The hidden state is only
   opacity + a small offset/scale — it NEVER clips itself out of an overflow-hidden ancestor (the
   old `mask` variant did, which broke the IntersectionObserver and left every heading invisible).
   A 900ms failsafe guarantees content is shown even if the observer never fires.
-- Motion CSS lives in `globals.css`: `.reel-grain` (placeholder media grain), `.scroll-arrow`,
-  and the `.hover-link` doubled-text mask.
-- All motion respects `prefers-reduced-motion`: no preloader animation, no scroll-expand, no
-  video autoplay, and `Reveal` renders content statically.
+- Motion CSS lives in `globals.css`: `.reel-grain` (placeholder media grain) and the
+  `.hover-link` doubled-text mask.
+- All motion respects `prefers-reduced-motion`: no preloader animation, no video autoplay, and
+  `Reveal` renders content statically.
 
 ## Placeholders to replace (search "PLACEHOLDER")
+- `public/novum-reel-poster.jpg` — NOT in the repo yet; `Showreel` references it as the video
+  poster. Add a still (e.g. a frame of the reel) so the poster/fallback shows before play.
 - Team thumbnails + expanded images (`components/sections/Team.tsx`) — swap grain blocks for
   real photos.
-- Optional: add a poster still for the reel (e.g. `public/novum-reel-poster.jpg`) and pass it to
-  `<ReelVideo poster=... />` in About + ScrollExpand.
 - Join email capture is styled-only (non-functional) — wire to an endpoint to enable.
 - Address: `hello@novum.example` (Join Apply + Footer Email); Instagram `#` (Footer).
 

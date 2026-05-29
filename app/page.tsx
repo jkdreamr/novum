@@ -5,7 +5,7 @@ import { useLenis, getLenis } from '@/hooks/useLenis';
 import Preloader from '@/components/Preloader';
 import Nav from '@/components/Nav';
 import About from '@/components/sections/About';
-import ScrollExpand from '@/components/ScrollExpand';
+import Showreel from '@/components/Showreel';
 import Team from '@/components/sections/Team';
 import Join from '@/components/sections/Join';
 import Footer from '@/components/Footer';
@@ -39,8 +39,8 @@ export default function Page() {
       <Nav />
       <main>
         <About />
-        {/* Scroll-linked expand showreel — the dramatic transition into Team. */}
-        <ScrollExpand />
+        {/* Clean full-bleed reel — no text over the footage. */}
+        <Showreel />
         <Team />
         <Join />
       </main>

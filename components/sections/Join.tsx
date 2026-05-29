@@ -17,7 +17,7 @@ export default function Join() {
   const onSubmit = (e: FormEvent) => e.preventDefault();
 
   return (
-    <section id="join" className="px-5 py-[clamp(6rem,12vw,12rem)] sm:px-8">
+    <section id="join" className="px-6 py-[clamp(6rem,12vw,12rem)] sm:px-10 lg:px-16">
       {/* Section header */}
       <div className="mb-[clamp(2.5rem,6vw,5rem)] flex items-baseline justify-between text-[0.7rem] uppercase tracking-label text-bone/50">
         <Reveal variant="fade" as="span">

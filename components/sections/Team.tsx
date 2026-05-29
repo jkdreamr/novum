@@ -105,7 +105,7 @@ export default function Team() {
   const [open, setOpen] = useState<string | null>(null);
 
   return (
-    <section id="team" className="px-5 py-[clamp(6rem,12vw,11rem)] sm:px-8">
+    <section id="team" className="px-6 py-[clamp(6rem,12vw,11rem)] sm:px-10 lg:px-16">
       {/* Section header */}
       <div className="mb-[clamp(2.5rem,6vw,5rem)] grid grid-cols-12 gap-y-6">
         <span className="col-span-12 text-[0.7rem] uppercase tracking-label text-bone/50 md:col-span-3">

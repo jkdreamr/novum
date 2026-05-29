@@ -109,21 +109,6 @@ html.is-locked body {
   animation: grain-drift 14s ease-in-out infinite;
 }
 
-/* ---- Hero scroll cue --------------------------------------------------------- */
-@keyframes scroll-bounce {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(5px);
-  }
-}
-.scroll-arrow {
-  display: inline-block;
-  animation: scroll-bounce 1.6s ease-in-out infinite;
-}
-
 /* ---- Accessibility ----------------------------------------------------------- */
 :focus-visible {
   outline: 2px solid var(--accent);

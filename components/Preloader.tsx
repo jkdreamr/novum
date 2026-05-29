@@ -1,20 +1,15 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 
-// Words cross-fading center-screen as the count climbs (the deck's mediums + identity).
+// Words cycle as the count climbs and morph toward the brand: the disciplines render in mono,
+// then the final NOVUM lands large in the display face right before the wipe.
 const WORDS = ['MUSIC', 'VISUALS', 'PERFORMANCE', 'SYSTEMS', 'NOVUM'];
-const COUNT_MS = 2200; // duration of the 0 → 100 count
+const COUNT_MS = 1700; // 0 → 100
 
 type Phase = 'idle' | 'counting' | 'wiping' | 'gone';
 
-/**
- * First-load preloader (adcker-style): ink screen, a mono counter ticking 0→100 bottom-left,
- * placeholder frames cross-fading center, then a wipe-up reveal. Runs once per session via
- * sessionStorage; skipped entirely (with an immediate handoff) on return visits or under
- * prefers-reduced-motion.
- */
 export default function Preloader({ onComplete }: { onComplete: () => void }) {
   const [count, setCount] = useState(0);
   const [phase, setPhase] = useState<Phase>('idle');
@@ -26,7 +21,7 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
     try {
       sessionStorage.setItem('novum_preloaded', '1');
     } catch {
-      /* sessionStorage may be unavailable (private mode) — non-fatal. */
+      /* private mode — non-fatal */
     }
     onComplete();
   };
@@ -39,8 +34,6 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
       seen = false;
     }
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    // Return visitors and reduced-motion users skip straight to the page.
     if (seen || reduced) {
       setPhase('gone');
       finish();
@@ -52,13 +45,14 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
     let raf = 0;
     const tick = (now: number) => {
       const t = Math.min(1, (now - start) / COUNT_MS);
-      const eased = 1 - Math.pow(1 - t, 3); // easeOutCubic — settles into 100
+      const eased = 1 - Math.pow(1 - t, 3);
       setCount(Math.round(eased * 100));
       if (t < 1) {
         raf = requestAnimationFrame(tick);
       } else {
         setCount(100);
-        window.setTimeout(() => setPhase('wiping'), 280); // brief hold at 100
+        // Let the big NOVUM land and hold a beat before wiping.
+        window.setTimeout(() => setPhase('wiping'), 450);
       }
     };
     raf = requestAnimationFrame(tick);
@@ -66,17 +60,27 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Failsafe: never leave the overlay up if the wipe's onAnimationComplete doesn't fire.
+  useEffect(() => {
+    if (phase !== 'wiping') return;
+    const id = window.setTimeout(finish, 1000);
+    return () => window.clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase]);
+
   if (phase === 'gone') return null;
 
   const activeWord = Math.min(WORDS.length - 1, Math.floor((count / 100) * WORDS.length));
+  const word = WORDS[activeWord];
+  const isFinal = activeWord === WORDS.length - 1;
 
   return (
     <motion.div
       aria-hidden="true"
-      className="fixed inset-0 z-[9995] flex items-center justify-center bg-ink"
+      className="fixed inset-0 z-[9995] overflow-hidden bg-ink"
       initial={{ y: 0 }}
       animate={phase === 'wiping' ? { y: '-100%' } : { y: 0 }}
-      transition={{ duration: 0.9, ease: [0.76, 0, 0.24, 1] }}
+      transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
       onAnimationComplete={() => {
         if (phase === 'wiping') {
           setPhase('gone');
@@ -84,31 +88,45 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
         }
       }}
     >
-      {/* Center word stack — cross-fading as the count climbs. */}
-      <div className="relative flex h-[30vmin] w-full items-center justify-center px-6">
-        {WORDS.map((w, i) => (
-          <span
-            key={w}
-            className="absolute font-display text-[clamp(2rem,10vw,7rem)] font-medium uppercase tracking-[-0.03em] text-bone transition-opacity duration-500"
-            style={{ opacity: i === activeWord ? 1 : 0 }}
-          >
-            {w}
-          </span>
-        ))}
-      </div>
-
-      {/* Counter — pinned bottom-left. */}
-      <div className="pointer-events-none absolute bottom-6 left-5 font-mono text-bone sm:bottom-8 sm:left-8">
-        <span className="text-[clamp(2.5rem,9vw,5rem)] leading-none tabular-nums">{count}</span>
-        <span className="ml-1 align-top text-sm text-bone/60">%</span>
-      </div>
-
-      {/* Corner labels. */}
-      <span className="absolute left-5 top-6 font-mono text-[0.7rem] uppercase tracking-label text-bone/45 sm:left-8 sm:top-8">
-        ( Loading )
+      {/* Composed corner labels */}
+      <span className="absolute left-6 top-6 text-[0.7rem] uppercase tracking-label text-bone/45 sm:left-10 sm:top-8 lg:left-16">
+        ( NOVUM )
       </span>
-      <span className="absolute right-5 top-6 font-mono text-[0.7rem] uppercase tracking-label text-bone/45 sm:right-8 sm:top-8">
-        NOVUM
+      <span className="absolute right-6 top-6 text-[0.7rem] uppercase tracking-label text-bone/45 sm:right-10 sm:top-8 lg:right-16">
+        ( LOADING )
+      </span>
+
+      {/* Center word — mono disciplines morphing into the big display NOVUM. */}
+      <div className="absolute inset-0 flex items-center justify-center px-6">
+        <AnimatePresence>
+          <motion.span
+            key={word}
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -14 }}
+            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+            className={
+              isFinal
+                ? 'absolute font-display font-medium uppercase leading-none tracking-[-0.04em] text-bone text-[clamp(3.5rem,16vw,13rem)]'
+                : 'absolute font-mono uppercase tracking-label text-bone/75 text-[clamp(1.25rem,3.5vw,2.25rem)]'
+            }
+          >
+            {word}
+          </motion.span>
+        </AnimatePresence>
+      </div>
+
+      {/* Oversized counter, pinned bottom-left. */}
+      <div className="absolute bottom-[clamp(1rem,4vw,3rem)] left-6 flex items-end leading-none sm:left-10 lg:left-16">
+        <span className="font-mono font-bold tabular-nums text-bone text-[clamp(4.5rem,17vw,13rem)]">
+          {String(count).padStart(2, '0')}
+        </span>
+        <span className="mb-[0.6em] ml-2 font-mono text-sm text-bone/50">%</span>
+      </div>
+
+      {/* Bottom-right marker */}
+      <span className="absolute bottom-[clamp(1.25rem,4vw,3rem)] right-6 text-[0.7rem] uppercase tracking-label text-bone/45 sm:right-10 lg:right-16">
+        ( EST. 2026 )
       </span>
     </motion.div>
   );
