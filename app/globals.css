@@ -16,7 +16,7 @@
   --glass-bg:       rgba(255, 255, 255, 0.035);
   --glass-border:   rgba(255, 255, 255, 0.07);
   --glass-glow:     rgba(200, 169, 110, 0.12);
-  --font-display:   'Cormorant Garamond', Georgia, serif;
+  --font-display:   var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
   --font-body:      'Neue Montreal', 'Helvetica Neue', sans-serif;
 }
 
@@ -59,3 +59,27 @@ body::after {
 
 /* Selection */
 ::selection { background: rgba(200, 169, 110, 0.25); color: var(--text-primary); }
+
+/* Black cover painted on the server before the intro decides what to do — kills any
+   flash of page content while the intro chunk loads. */
+.boot-cover {
+  position: fixed;
+  inset: 0;
+  background: #000000;
+  z-index: 9995;
+}
+
+/* Lock scrolling while the intro plays / before the page is ready. */
+html.intro-lock,
+html.intro-lock body {
+  overflow: hidden !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

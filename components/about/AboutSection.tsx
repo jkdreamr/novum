@@ -5,6 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import dynamic from 'next/dynamic';
 import GlassCard from '@/components/shared/GlassCard';
 import SectionLabel from '@/components/shared/SectionLabel';
+import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 
 const OrbScene = dynamic(() => import('./OrbScene'), { ssr: false });
 
@@ -175,9 +176,11 @@ export default function AboutSection() {
         {/* Right: Glass card with orbital 3D accent */}
         <div ref={cardRef} style={{ opacity: 0 }}>
           <GlassCard>
-            {/* Mini Three.js orb */}
-            <div style={{ height: '200px', width: '100%', marginBottom: '1.5rem' }}>
-              <OrbScene />
+            {/* Mini Three.js orb — explicit height so the canvas never collapses */}
+            <div style={{ position: 'relative', height: '200px', minHeight: '200px', width: '100%', marginBottom: '1.5rem' }}>
+              <ErrorBoundary>
+                <OrbScene />
+              </ErrorBoundary>
             </div>
             <p style={{
               fontFamily: 'var(--font-display)',

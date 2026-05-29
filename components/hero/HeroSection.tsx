@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 
 const PhilosopherScene = dynamic(() => import('./PhilosopherScene'), { ssr: false });
 
@@ -14,43 +15,27 @@ export default function HeroSection() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Scroll animation: scrub-linked parallax
-      // Text slides up + fades
+      // Text slides up + fades on scroll
       gsap.to(textRef.current, {
         y: -80,
         opacity: 0,
         ease: 'none',
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top top',
-          end: 'bottom top',
-          scrub: 1.2,
-        },
+        scrollTrigger: { trigger: sectionRef.current, start: 'top top', end: 'bottom top', scrub: 1.2 },
       });
       // 3D bust scales down + drifts left (Ancient Art Museum scroll behaviour)
       gsap.to(canvasWrapRef.current, {
-        scale: 0.58,
-        x: '-18%',
-        opacity: 0.4,
+        scale: 0.62,
+        x: '-14%',
+        opacity: 0.35,
         ease: 'none',
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top top',
-          end: 'bottom top',
-          scrub: 1.5,
-        },
+        scrollTrigger: { trigger: sectionRef.current, start: 'top top', end: 'bottom top', scrub: 1.5 },
       });
-      // Label drifts opposite direction
+      // Label drifts up
       gsap.to(labelRef.current, {
         y: -40,
         opacity: 0,
         ease: 'none',
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top top',
-          end: '60% top',
-          scrub: 1,
-        },
+        scrollTrigger: { trigger: sectionRef.current, start: 'top top', end: '60% top', scrub: 1 },
       });
     }, sectionRef);
     return () => ctx.revert();
@@ -69,26 +54,29 @@ export default function HeroSection() {
         alignItems: 'center',
       }}
     >
-      {/* 3D Scene — fills the right portion and center */}
+      {/* 3D sculpture — anchored to the right half of the frame */}
       <div
         ref={canvasWrapRef}
+        style={{ position: 'absolute', inset: 0, transformOrigin: 'center center' }}
+      >
+        <ErrorBoundary>
+          <PhilosopherScene />
+        </ErrorBoundary>
+      </div>
+
+      {/* Composition gradients: darken the left for legible text + a soft edge vignette that
+          keeps a wide clear core around the sculpture (so it is never hidden). */}
+      <div
         style={{
           position: 'absolute',
           inset: 0,
-          transformOrigin: 'center center',
+          background:
+            'linear-gradient(90deg, var(--bg-base) 0%, rgba(8,8,14,0.55) 30%, rgba(8,8,14,0) 58%), ' +
+            'radial-gradient(ellipse 95% 95% at 68% 48%, rgba(8,8,14,0) 55%, var(--bg-base) 100%)',
+          pointerEvents: 'none',
+          zIndex: 2,
         }}
-      >
-        <PhilosopherScene />
-      </div>
-
-      {/* Radial vignette overlay */}
-      <div style={{
-        position: 'absolute',
-        inset: 0,
-        background: 'radial-gradient(ellipse 70% 80% at 60% 50%, transparent 30%, var(--bg-base) 100%)',
-        pointerEvents: 'none',
-        zIndex: 2,
-      }} />
+      />
 
       {/* Top label — upper left */}
       <div
@@ -109,15 +97,10 @@ export default function HeroSection() {
         — est. 2024 —
       </div>
 
-      {/* Hero text — left center */}
+      {/* Hero text — left centre */}
       <div
         ref={textRef}
-        style={{
-          position: 'relative',
-          zIndex: 10,
-          paddingLeft: '3rem',
-          maxWidth: '520px',
-        }}
+        style={{ position: 'relative', zIndex: 10, paddingLeft: '3rem', maxWidth: '520px' }}
       >
         <p style={{
           fontFamily: 'var(--font-body)',
@@ -131,7 +114,7 @@ export default function HeroSection() {
         </p>
         <h1 style={{
           fontFamily: 'var(--font-display)',
-          fontWeight: 200,
+          fontWeight: 300,
           fontSize: 'clamp(2.8rem, 5.5vw, 5.5rem)',
           lineHeight: 1.1,
           color: 'var(--text-primary)',
@@ -153,7 +136,7 @@ export default function HeroSection() {
         </p>
       </div>
 
-      {/* Scroll indicator — bottom center */}
+      {/* Scroll indicator — bottom centre */}
       <div style={{
         position: 'absolute',
         bottom: '2.5rem',

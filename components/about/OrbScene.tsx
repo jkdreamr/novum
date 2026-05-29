@@ -1,7 +1,7 @@
 'use client';
 import { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Environment } from '@react-three/drei';
+import { Environment, Lightformer } from '@react-three/drei';
 import * as THREE from 'three';
 
 function Orb() {
@@ -22,25 +22,12 @@ function Orb() {
   return (
     <>
       <mesh ref={torusRef}>
-        <torusGeometry args={[1.1, 0.06, 16, 100]} />
-        <meshPhysicalMaterial
-          color="#c8a96e"
-          metalness={0.7}
-          roughness={0.2}
-          transmission={0.3}
-          emissive="#c8a96e"
-          emissiveIntensity={0.1}
-        />
+        <torusGeometry args={[1.1, 0.06, 24, 120]} />
+        <meshPhysicalMaterial color="#c8a96e" metalness={0.8} roughness={0.18} emissive="#3a2c12" emissiveIntensity={0.3} envMapIntensity={1.6} />
       </mesh>
       <mesh ref={innerRef}>
-        <sphereGeometry args={[0.6, 32, 32]} />
-        <meshPhysicalMaterial
-          transmission={0.95}
-          roughness={0.05}
-          ior={1.5}
-          thickness={0.4}
-          color="#ddd0b8"
-        />
+        <icosahedronGeometry args={[0.6, 1]} />
+        <meshPhysicalMaterial transmission={0.95} roughness={0.06} ior={1.5} thickness={0.6} color="#e7dcc4" clearcoat={1} envMapIntensity={1.8} transparent />
       </mesh>
     </>
   );
@@ -48,10 +35,18 @@ function Orb() {
 
 export default function OrbScene() {
   return (
-    <Canvas camera={{ position: [0, 0, 3.5], fov: 45 }} gl={{ alpha: true, antialias: true }}>
-      <Environment preset="city" />
-      <ambientLight intensity={0.4} />
-      <pointLight position={[2, 2, 2]} intensity={1} color="#c8a96e" />
+    <Canvas
+      camera={{ position: [0, 0, 3.5], fov: 45 }}
+      style={{ width: '100%', height: '100%', display: 'block' }}
+      gl={{ alpha: true, antialias: true }}
+      dpr={[1, 2]}
+    >
+      <ambientLight intensity={0.5} />
+      <pointLight position={[2, 2, 2]} intensity={1.2} color="#c8a96e" />
+      <Environment resolution={128}>
+        <Lightformer form="rect" intensity={2} color="#fff3da" position={[0, 2, 3]} scale={[5, 3, 1]} />
+        <Lightformer form="rect" intensity={1.2} color="#1e7a72" position={[-3, 0, 2]} scale={[2, 3, 1]} />
+      </Environment>
       <Orb />
     </Canvas>
   );

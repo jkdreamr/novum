@@ -1,70 +1,90 @@
 'use client';
-import { useRef } from 'react';
+import { Suspense, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Center, Environment } from '@react-three/drei';
+import { Center, Text3D, MeshTransmissionMaterial, Environment, Lightformer } from '@react-three/drei';
 import * as THREE from 'three';
 
-// Fallback: three box meshes spelling "novum" since font JSON conversion
-// may not be available at build time (as noted in spec §4)
-function GlassBoxLetters() {
-  const groupRef = useRef<THREE.Group>(null);
+// Real extruded 3D letterforms — a serif typeface JSON subset to just "novum" (see scripts/subset-font.mjs).
+const FONT_URL = '/fonts/serif_novum.typeface.json';
 
-  useFrame(({ clock }) => {
-    if (!groupRef.current) return;
-    groupRef.current.rotation.y = Math.sin(clock.elapsedTime * 0.3) * 0.08;
-    groupRef.current.rotation.x = Math.sin(clock.elapsedTime * 0.2) * 0.04;
+function GlassWord() {
+  const ref = useRef<THREE.Group>(null);
+
+  useFrame(({ clock, pointer }) => {
+    if (!ref.current) return;
+    const t = clock.elapsedTime;
+    // gentle, dreamy float + subtle mouse parallax
+    ref.current.rotation.y = Math.sin(t * 0.4) * 0.13 + pointer.x * 0.12;
+    ref.current.rotation.x = Math.sin(t * 0.27) * 0.05 - pointer.y * 0.08;
+    ref.current.position.y = Math.sin(t * 0.6) * 0.035;
   });
 
-  const material = (
-    <meshPhysicalMaterial
-      transmission={1}
-      roughness={0.04}
-      metalness={0}
-      ior={1.52}
-      thickness={0.6}
-      envMapIntensity={2.5}
-      color="#e8dcc8"
-      transparent
-      opacity={0.95}
-    />
-  );
-
-  // Approximate letter widths for "novum" — 5 letters
-  const letterPositions = [-2.2, -1.1, 0, 1.1, 2.2];
-  const letterSizes: [number, number, number][] = [
-    [0.7, 1.1, 0.25], // n
-    [0.55, 0.85, 0.25], // o
-    [0.5, 1.1, 0.25],  // v
-    [0.7, 0.85, 0.25], // u
-    [0.85, 1.1, 0.25], // m
-  ];
-
   return (
-    <group ref={groupRef}>
-      {letterPositions.map((x, i) => (
-        <mesh key={i} position={[x, 0, 0]}>
-          <boxGeometry args={letterSizes[i]} />
-          {material}
-        </mesh>
-      ))}
+    <group ref={ref}>
+      <Center>
+        <Text3D
+          font={FONT_URL}
+          size={0.85}
+          height={0.4}
+          curveSegments={20}
+          bevelEnabled
+          bevelThickness={0.05}
+          bevelSize={0.03}
+          bevelOffset={0}
+          bevelSegments={10}
+          letterSpacing={0.01}
+        >
+          novum
+          <MeshTransmissionMaterial
+            backside
+            samples={6}
+            resolution={1024}
+            thickness={0.55}
+            roughness={0.05}
+            chromaticAberration={0.45}
+            distortion={0.15}
+            distortionScale={0.3}
+            temporalDistortion={0.08}
+            ior={1.5}
+            color="#f4ecd9"
+            attenuationColor="#d8c39c"
+            attenuationDistance={1.6}
+            clearcoat={1}
+            clearcoatRoughness={0.04}
+            envMapIntensity={2.4}
+          />
+        </Text3D>
+      </Center>
     </group>
+  );
+}
+
+function StudioEnv() {
+  return (
+    <Environment resolution={256}>
+      <Lightformer form="rect" intensity={3} color="#fff4e0" position={[0, 2, 4]} scale={[8, 4, 1]} />
+      <Lightformer form="rect" intensity={1.6} color="#c8a96e" position={[-4, -1, 3]} rotation={[0, 0.4, 0]} scale={[3, 4, 1]} />
+      <Lightformer form="rect" intensity={1.4} color="#1e7a72" position={[4, 1, -2]} rotation={[0, -0.4, 0]} scale={[3, 4, 1]} />
+      <Lightformer form="circle" intensity={2} color="#ffffff" position={[0, 3, -4]} scale={4} />
+    </Environment>
   );
 }
 
 export default function GlassTextScene() {
   return (
     <Canvas
-      camera={{ position: [0, 0, 6], fov: 45 }}
+      camera={{ position: [0, 0, 6], fov: 40 }}
       style={{ width: '100%', height: '100%', background: 'transparent' }}
       gl={{ alpha: true, antialias: true }}
+      dpr={[1, 2]}
     >
-      <Environment preset="city" />
-      <ambientLight intensity={0.3} />
-      <pointLight position={[4, 4, 4]} intensity={1.5} color="#c8a96e" />
-      <pointLight position={[-4, -2, -4]} intensity={0.8} color="#1e7a72" />
-      <Center>
-        <GlassBoxLetters />
-      </Center>
+      <ambientLight intensity={0.4} />
+      <pointLight position={[4, 4, 4]} intensity={1.4} color="#c8a96e" />
+      <pointLight position={[-4, -2, 2]} intensity={0.8} color="#1e7a72" />
+      <Suspense fallback={null}>
+        <GlassWord />
+        <StudioEnv />
+      </Suspense>
     </Canvas>
   );
 }

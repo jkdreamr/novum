@@ -55,7 +55,7 @@ export default function TeamSection() {
         <SectionLabel number="02" label="the team" />
         <h2 style={{
           fontFamily: 'var(--font-display)',
-          fontWeight: 200,
+          fontWeight: 300,
           fontSize: 'clamp(2.2rem, 4vw, 4rem)',
           color: 'var(--text-primary)',
           margin: '1.5rem 0 4rem',

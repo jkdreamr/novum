@@ -12,7 +12,7 @@ export default function Footer() {
     >
       <div style={{
         fontFamily: 'var(--font-display)',
-        fontWeight: 200,
+        fontWeight: 300,
         fontSize: '1.5rem',
         letterSpacing: '0.2em',
         color: 'var(--text-primary)',

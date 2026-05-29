@@ -16,13 +16,26 @@ Use `~/.local/bin/pnpm` (pnpm 9.15.0 installed locally — system pnpm is broken
 - Install: `~/.local/bin/pnpm install`
 
 ## Font note
-Cormorant Garamond via next/font/google supports weights: 300, 400, 500, 600, 700 (not 200).
-CSS variable `--font-display` is set to Cormorant Garamond; the `fontWeight: 200` style values
-in components are kept for editorial effect — they gracefully fall back to 300.
+Cormorant Garamond via next/font/google supports weights: 300, 400, 500 (we load 300/400/500).
+`next/font` only exposes the loaded face through the CSS variable `--font-cormorant`, so
+`--font-display` in `globals.css` references `var(--font-cormorant)` (NOT the literal family name,
+which would silently fall back to Georgia). Display headings use weight 300 (the lightest loaded).
 
-## 3D assets
-- `public/models/bust.glb` — place a CC0 GLB bust here; procedural fallback renders automatically if missing.
-- `public/fonts/cormorant_regular.json` — Three.js typeface JSON; GlassTextScene uses box geometry fallback since Text3D requires this.
+## 3D assets / rendering notes
+- `public/fonts/serif_regular.typeface.json` — Three.js typeface JSON (Droid Serif). `GlassTextScene`
+  uses `Text3D` + `MeshTransmissionMaterial` for real extruded glass letterforms.
+- `public/models/bust.glb` — optional. Drop a CC0 GLB bust here and set `BUST_MODEL_URL` in
+  `PhilosopherScene.tsx` to `/models/bust.glb`. By default an elegant sculptural fallback renders
+  (no network 404 for a missing file).
+- drei `Environment preset="..."` is NOT used — its HDRI CDN is blocked by the network policy.
+  All scenes build lighting from `<Environment><Lightformer/></Environment>` (no runtime fetch).
+- All WebGL scenes are wrapped in `ErrorBoundary` so a GPU/context failure can never white-screen the page.
+
+## Intro / scroll flow
+- `app/page.tsx` runs a `boot → intro → ready` state machine. A server-rendered `.boot-cover`
+  prevents content flash; scrolling is locked (`html.intro-lock` + Lenis `stop()`) until `ready`.
+- `ScrollTrigger.refresh()` is called once the intro overlay unmounts so scroll positions are correct.
+- Lenis instance is exposed via `useLenis()` from `SmoothScrollProvider`.
 
 ## Deployment
 - `vercel.json` is at project root

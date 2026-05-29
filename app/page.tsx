@@ -1,51 +1,95 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { gsap } from 'gsap';
-import HeroSection  from '@/components/hero/HeroSection';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useLenis } from '@/components/providers/SmoothScrollProvider';
+import HeroSection from '@/components/hero/HeroSection';
 import AboutSection from '@/components/about/AboutSection';
-import TeamSection  from '@/components/team/TeamSection';
-import JoinSection  from '@/components/join/JoinSection';
-import Footer       from '@/components/shared/Footer';
+import TeamSection from '@/components/team/TeamSection';
+import JoinSection from '@/components/join/JoinSection';
+import Footer from '@/components/shared/Footer';
 
 const IntroSequence = dynamic(() => import('@/components/intro/IntroSequence'), { ssr: false });
 
-export default function Home() {
-  const [showIntro, setShowIntro]   = useState(false);
-  const [introReady, setIntroReady] = useState(false);
-  const mainRef = useRef<HTMLDivElement>(null);
+type Stage = 'boot' | 'intro' | 'ready';
 
+export default function Home() {
+  const [stage, setStage] = useState<Stage>('boot');
+  const [showCover, setShowCover] = useState(true);
+  const coverRef = useRef<HTMLDivElement>(null);
+  const lenis = useLenis();
+
+  // Decide — once per session — whether to play the intro.
   useEffect(() => {
+    window.scrollTo(0, 0);
+    gsap.registerPlugin(ScrollTrigger);
+
     const seen = sessionStorage.getItem('novum_intro_seen');
     if (seen) {
-      setShowIntro(false);
-      // Page is immediately visible
-      if (mainRef.current) gsap.set(mainRef.current, { opacity: 1 });
+      const cover = coverRef.current;
+      if (cover) {
+        gsap.to(cover, {
+          opacity: 0,
+          duration: 0.7,
+          ease: 'power2.out',
+          onComplete: () => {
+            setShowCover(false);
+            setStage('ready');
+            ScrollTrigger.refresh();
+          },
+        });
+      } else {
+        setShowCover(false);
+        setStage('ready');
+      }
     } else {
-      setShowIntro(true);
-      if (mainRef.current) gsap.set(mainRef.current, { opacity: 0 });
+      setStage('intro');
     }
-    setIntroReady(true);
   }, []);
 
-  const handleIntroComplete = () => {
-    setShowIntro(false);
-    // Fade in main content
-    gsap.to(mainRef.current, { opacity: 1, duration: 0.6, ease: 'power2.out' });
-  };
+  // Safety net: never let a stalled intro trap the page behind the cover.
+  useEffect(() => {
+    if (stage !== 'intro') return;
+    const id = setTimeout(() => {
+      setShowCover(false);
+      setStage('ready');
+      ScrollTrigger.refresh();
+    }, 9000);
+    return () => clearTimeout(id);
+  }, [stage]);
 
-  if (!introReady) return null;
+  // Lock scrolling until the page is ready to explore.
+  useEffect(() => {
+    const locked = stage !== 'ready';
+    document.documentElement.classList.toggle('intro-lock', locked);
+    if (locked) lenis?.stop();
+    else lenis?.start();
+    return () => { document.documentElement.classList.remove('intro-lock'); };
+  }, [stage, lenis]);
+
+  const handleIntroComplete = () => {
+    setStage('ready');
+    // Recompute scroll positions once the layout has settled (intro overlay gone).
+    requestAnimationFrame(() => requestAnimationFrame(() => ScrollTrigger.refresh()));
+  };
 
   return (
     <>
-      {showIntro && <IntroSequence onComplete={handleIntroComplete} />}
-      <div ref={mainRef}>
+      <main>
         <HeroSection />
         <AboutSection />
         <TeamSection />
         <JoinSection />
         <Footer />
-      </div>
+      </main>
+
+      {/* Server-rendered black cover prevents any flash of content before the intro decides. */}
+      {showCover && <div ref={coverRef} className="boot-cover" aria-hidden />}
+
+      {stage === 'intro' && (
+        <IntroSequence onReady={() => setShowCover(false)} onComplete={handleIntroComplete} />
+      )}
     </>
   );
 }
