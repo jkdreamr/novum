@@ -126,11 +126,10 @@ export default function Team() {
         <span className="col-span-12 text-[0.7rem] uppercase tracking-label text-bone/50 md:col-span-3">
           ( 02 / TEAM )
         </span>
-        <div className="col-span-12 flex items-baseline justify-between gap-6 md:col-span-9">
+        <div className="col-span-12 md:col-span-9">
           <h2 className="font-display font-medium uppercase leading-[0.95] tracking-[-0.02em] text-bone text-[clamp(1.5rem,4vw,2.75rem)]">
             <Reveal variant="mask">THE PEOPLE BUILDING IT.</Reveal>
           </h2>
-          <span className="shrink-0 text-[0.7rem] uppercase tracking-label text-bone/40">( Click me )</span>
         </div>
       </div>
 

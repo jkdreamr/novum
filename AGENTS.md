@@ -102,17 +102,15 @@ type-driven (see `Statement`).
   session; reduced-motion skips; hard dismiss `HARD_DISMISS_MS = 5500`.
 
 ## Statement (`components/Statement.tsx`) — the bone "wash" beat
-- The cream/white moment, made FLASH-PROOF. Instead of interpolating `backgroundColor` (which can
-  overshoot to white and pops on fast scroll), a `bg-bone` overlay's OPACITY is eased by
-  scrollYProgress: `useTransform [0,0.42,0.86,1]→[0,1,1,0]` with `ease: easeInOut` — a gentle ease
-  IN, a LONG hold (0.42→0.86) so the white sits there at a relaxed pace, then a QUICK ease OUT
-  (0.86→1) so the next section arrives right after the white resolves (no long fade-to-black
-  trailing region). Opacity is clamped 0–1 (can't overshoot), bone is `#EDE8DF` (not white). The
-  serif statement + ghost words use `mix-blend-difference` (inside an `isolate` stage) so they
-  stay readable as the bg washes ink→bone→ink. Shared `WashStage`.
-- Desktop + motion → PinnedStatement: pinned over `h-[195vh]` (the dial). Mobile + motion →
-  FlowStatement: NOT pinned; the wash maps to the section passing through the viewport (cheap,
-  smooth on touch). Reduced-motion → StaticStatement (plain ink, serif headline, no wash).
+- NOT PINNED (any more). It's a single `h-[100svh]` section you scroll PAST — there is no sticky
+  track, which is what kept causing the "too much blank black space" (a long pin = lots of
+  in-place scrolling through a dark screen). As the section passes through the viewport a `bg-bone`
+  overlay's OPACITY eases in → holds → out (`useTransform [0,0.45,0.8,1]→[0,1,1,0]`, `easeInOut`).
+  Opacity is clamped 0–1 so it can't overshoot to white (flash-proof); bone is `#EDE8DF`. The serif
+  statement + ghost words use `mix-blend-difference` (inside an `isolate` stage) so they stay
+  readable as the bg washes ink→bone→ink, with a subtle scroll-scale on the type.
+- `FlowStatement` (desktop + mobile, motion) / `StaticStatement` (reduced-motion: plain ink, no
+  wash). No `useDesktopMotion` here any more — the same non-pinned flow works on every device.
 
 ## Mark3D (`components/Mark3D.tsx`) — the Team 3D icons
 - Pure CSS 3D (no WebGL): a wireframe `cube` or a `gyro` of rings, `transform-style: preserve-3d`,
