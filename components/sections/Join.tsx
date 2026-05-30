@@ -1,8 +1,10 @@
 'use client';
 
-import type { FormEvent } from 'react';
+import { useRef, type FormEvent } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import Reveal from '@/components/Reveal';
 import HoverLink from '@/components/HoverLink';
+import { useDesktopMotion } from '@/hooks/useDesktopMotion';
 
 const PATHS = [
   { word: 'ARTISTS', desc: 'build with us' },
@@ -10,6 +12,39 @@ const PATHS = [
   { word: 'SPONSORS', desc: 'fund the sessions' },
   { word: 'INVESTORS', desc: 'back the lab' },
 ];
+
+/** Closing line. Desktop: scroll-linked scale-from-gutter + letter-spacing track-out + emphasis
+ *  fade-in. Mobile / reduced-motion / SSR: a static clip-mask reveal. */
+function JoinClosing() {
+  const desktop = useDesktopMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end center'] });
+  const scale = useTransform(scrollYProgress, [0, 1], [0.84, 1.05]);
+  const letterSpacing = useTransform(scrollYProgress, [0, 1], ['-0.03em', '0.02em']);
+  const opacity = useTransform(scrollYProgress, [0, 0.4], [0.25, 1]);
+
+  return (
+    <div
+      ref={ref}
+      className="mt-[clamp(4rem,10vw,9rem)] overflow-hidden border-t border-bone/15 pt-[clamp(2.5rem,6vw,5rem)]"
+    >
+      {desktop ? (
+        <motion.h3
+          style={{ scale, letterSpacing, opacity }}
+          className="origin-left font-display text-[clamp(1.75rem,7vw,5.5rem)] font-medium uppercase leading-[0.92] text-bone will-change-transform"
+        >
+          BUILD THE NEW MEDIUM.
+        </motion.h3>
+      ) : (
+        <h3 className="font-display text-[clamp(1.75rem,7vw,5.5rem)] font-medium uppercase leading-[0.92] tracking-[-0.03em] text-bone">
+          <Reveal variant="mask">
+            <span className="block">BUILD THE NEW MEDIUM.</span>
+          </Reveal>
+        </h3>
+      )}
+    </div>
+  );
+}
 
 export default function Join() {
   // STYLED-ONLY: this capture does not submit anywhere. preventDefault stops the browser from
@@ -57,7 +92,7 @@ export default function Join() {
 
       {/* Apply + email capture */}
       <div className="mt-[clamp(3.5rem,9vw,7rem)] grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-16">
-        <Reveal variant="rise">
+        <Reveal variant="mask">
           <div className="flex flex-col gap-4">
             <span className="text-[0.7rem] uppercase tracking-label text-bone/50">( Apply )</span>
             {/* PLACEHOLDER address — confirm/replace hello@novum.example. */}
@@ -98,13 +133,7 @@ export default function Join() {
       </div>
 
       {/* Closing line */}
-      <div className="mt-[clamp(4rem,10vw,9rem)] border-t border-bone/15 pt-[clamp(2.5rem,6vw,5rem)]">
-        <h3 className="font-display font-medium uppercase leading-[0.92] tracking-[-0.03em] text-[clamp(2rem,8vw,7rem)]">
-          <Reveal variant="mask">
-            <span className="block">BUILD THE NEW MEDIUM.</span>
-          </Reveal>
-        </h3>
-      </div>
+      <JoinClosing />
     </section>
   );
 }

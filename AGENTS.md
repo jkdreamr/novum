@@ -63,11 +63,16 @@ type-driven (see `Statement`).
 ## Layout + sections
 - Consistent page gutter everywhere: `px-6 sm:px-10 lg:px-16` (24/40/64px).
 - EXACTLY three sections: `components/sections/{About,Team,Join}`. About = hero only (pure-type
-  headline, clip-mask line reveals). Team = condensed Joshua + Anna rows w/ click-to-expand
-  accordion. Join = statement + four ways in + Apply + styled email + closing line. `Statement`
-  is a transition (not a section) between About and Team.
+  headline, clip-mask line reveals). Team = NAMES ONLY (no images) — big outline-on-hover display
+  names + a small auto-rotating CSS-3D mark each (cube / gyro), role in mono, optional click-to-
+  expand focus blurb; on desktop the two names parallax at different rates on scroll. Join =
+  statement + four ways in + Apply (clip-mask reveal) + styled email + a scroll-linked closing
+  ("BUILD THE NEW MEDIUM." scales from the gutter + tracks letter-spacing out on desktop, static
+  on mobile). `Statement` is a transition (not a section) between About and Team.
 - Components: `Preloader`, `Nav`, `HoverLink` (doubled-text reveal; a/button/span), `Reveal`,
-  `Statement` (the dramatic type beat), `Footer`.
+  `Statement` (the dramatic type beat), `Mark3D` (CSS-3D mark), `Footer`. Desktop-vs-mobile
+  effect gating goes through `hooks/useDesktopMotion.ts` (`min-width:768px` + no-preference).
+- NO video / WebGL anywhere — pure type + motion. The Team 3D marks are pure CSS 3D (see Mark3D).
 
 ## Preloader (`components/Preloader.tsx`) — timing
 - Counter 0→100 over `COUNT_MS = 4000` (smoothstep, no sprint). The center word cycles every
@@ -77,25 +82,28 @@ type-driven (see `Statement`).
   session; reduced-motion skips; hard dismiss `HARD_DISMISS_MS = 5500`.
 
 ## Statement (`components/Statement.tsx`) — the dramatic scroll moment
-- Desktop + motion-OK → a pinned, scroll-LINKED beat (`useScroll`/`useTransform`, raw): the
-  palette inverts ink↔bone, a giant "THE NEXT / LABEL IS / A LAB." zooms toward the viewer
-  (`scale 0.55→1→1.6`), and faint oversized words drift horizontally in opposite directions for
-  depth. Track is `h-[170vh]` and the animation spans the full pin so it hands straight off to
-  Team with NO dead gap (the palette returns to ink by the end). Mobile / reduced-motion / SSR →
-  a static bone-on-ink contrast block (palette-flip beat) with a clip-mask reveal, no pinning.
+- Desktop + motion-OK → a pinned, scroll-LINKED beat (`useScroll`/`useTransform`): palette
+  inverts ink↔bone, "THE NEXT / LABEL IS / A LAB." zooms toward the viewer (`scale 0.7→1.2`,
+  opacity fade-IN only so it stays visible), faint oversized words drift horizontally for depth.
+  Track is `h-[140vh]` (~40vh pin) — TIGHTENED from 170vh, and the statement no longer fades to
+  empty, which is what removed the dead black screen before Team (palette returns to ink at the
+  end → continuous handoff). Mobile / reduced-motion / SSR → a static bone-on-ink block.
+
+## Mark3D (`components/Mark3D.tsx`) — the Team 3D icons
+- Pure CSS 3D (no WebGL): a wireframe `cube` or a `gyro` of rings, `transform-style: preserve-3d`,
+  auto-rotating via CSS keyframes; one accent edge. Sized via `--s`. Performant on every device;
+  reduced-motion freezes it to a static wireframe. (Chose CSS-3D over react-three-fiber to avoid
+  shipping untestable WebGL/bundle weight on mobile — swap-in R3F later if a heavier look is wanted.)
 
 ## Reveal (`components/Reveal.tsx`)
-- `mask` = clip-mask line rise: an overflow-hidden outer frame (which carries the ref/observer,
-  so it's never clipped out of view) with the content riding up inside it. `rise`/`clip`/`fade`
-  are flat opacity + offset/scale. All reveal via the rect-check + observer + 2.5s catch-all
-  above, so they animate on scroll yet can never stay hidden.
-- Other motion CSS in `globals.css`: `.reel-grain` (a grain texture reused by Team's placeholder
-  blocks — not video) and the `.hover-link` doubled-text mask.
-- All motion respects `prefers-reduced-motion` (static, fully visible).
+- `mask` = clip-mask line rise: an overflow-hidden outer frame (which carries the ref/observer, so
+  it's never clipped out of view) with the content riding up inside it. `rise`/`clip`/`fade` are
+  flat opacity + offset/scale. All reveal via the rect-check + observer + 2.5s catch-all, so they
+  animate on scroll yet can never stay hidden.
+- Motion CSS in `globals.css`: `.mark3d` (3D marks), `.outline-name` (Team hover outline), and the
+  `.hover-link` doubled-text mask. All motion respects `prefers-reduced-motion` (static, visible).
 
 ## Placeholders to replace (search "PLACEHOLDER")
-- Team thumbnails + expanded images (`components/sections/Team.tsx`) — swap grain blocks for
-  real photos.
 - Join email capture is styled-only (non-functional) — wire to an endpoint to enable.
 - Address: `hello@novum.example` (Join Apply + Footer Email); Instagram `#` (Footer).
 

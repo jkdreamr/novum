@@ -1,31 +1,22 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import Reveal from '@/components/Reveal';
+import { useDesktopMotion } from '@/hooks/useDesktopMotion';
 
 /**
- * The dramatic type moment that replaces the old video block. Desktop + motion-OK: a pinned,
- * scroll-LINKED beat — the palette inverts ink↔bone, a giant statement zooms toward the viewer,
- * and faint oversized words drift horizontally for depth, then it hands straight off to Team
- * (no dead gap). Mobile / reduced-motion / SSR: a static bone-on-ink contrast block (still a
- * palette-flip beat) that's fully visible with a clip-mask reveal — no pinning, so it's smooth.
+ * The dramatic type moment (no video). Desktop + motion-OK: a pinned, scroll-LINKED beat — the
+ * palette inverts ink↔bone, a giant "THE NEXT / LABEL IS / A LAB." zooms toward the viewer, and
+ * faint oversized words drift horizontally for depth. The track is sized so the statement stays
+ * visible across the WHOLE pin and the palette returns to ink right as it releases into Team — no
+ * dead black screen. Mobile / reduced-motion / SSR: a static bone-on-ink contrast block.
  */
 export default function Statement() {
-  const [pinned, setPinned] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 768px) and (prefers-reduced-motion: no-preference)');
-    const update = () => setPinned(mq.matches);
-    update();
-    mq.addEventListener('change', update);
-    return () => mq.removeEventListener('change', update);
-  }, []);
-
-  return pinned ? <PinnedStatement /> : <StaticStatement />;
+  const desktop = useDesktopMotion();
+  return desktop ? <PinnedStatement /> : <StaticStatement />;
 }
 
-/* Mobile / reduced-motion / SSR: a static palette-flip block (bone bg, ink type). */
 function StaticStatement() {
   return (
     <section
@@ -50,28 +41,28 @@ function StaticStatement() {
   );
 }
 
-/* Desktop: pinned, scroll-linked invert + zoom + parallax drift. */
 function PinnedStatement() {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] });
 
   // Palette inverts ink → bone → ink, so it opens out of About and flows back into Team (both ink).
-  const bg = useTransform(scrollYProgress, [0, 0.28, 0.72, 1], ['#0A0A0A', '#EDE8DF', '#EDE8DF', '#0A0A0A']);
-  const fg = useTransform(scrollYProgress, [0, 0.28, 0.72, 1], ['#EDE8DF', '#0A0A0A', '#0A0A0A', '#EDE8DF']);
-  // Massive scroll-scaling type: zooms toward the viewer, then fades as it hands off.
-  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.55, 1, 1.6]);
-  const opacity = useTransform(scrollYProgress, [0, 0.12, 0.86, 1], [0, 1, 1, 0]);
+  const bg = useTransform(scrollYProgress, [0, 0.3, 0.72, 1], ['#0A0A0A', '#EDE8DF', '#EDE8DF', '#0A0A0A']);
+  const fg = useTransform(scrollYProgress, [0, 0.3, 0.72, 1], ['#EDE8DF', '#0A0A0A', '#0A0A0A', '#EDE8DF']);
+  // Zooms toward the viewer. Fades IN only and stays visible to the end — no empty pinned screen.
+  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.7, 1, 1.2]);
+  const opacity = useTransform(scrollYProgress, [0, 0.15], [0, 1]);
   // Opposing horizontal parallax drift on faint oversized words (depth).
-  const driftA = useTransform(scrollYProgress, [0, 1], ['8%', '-26%']);
-  const driftB = useTransform(scrollYProgress, [0, 1], ['-16%', '22%']);
+  const driftA = useTransform(scrollYProgress, [0, 1], ['8%', '-24%']);
+  const driftB = useTransform(scrollYProgress, [0, 1], ['-14%', '20%']);
 
   return (
-    <section ref={ref} aria-label="The next label is a lab" className="relative h-[170vh]">
+    // 140vh track → ~40vh pin; the statement animates across the whole range, so there's no dead
+    // black space before Team (was 170vh / ~70vh, which left an empty pinned screen at the end).
+    <section ref={ref} aria-label="The next label is a lab" className="relative h-[140vh]">
       <motion.div
         style={{ backgroundColor: bg, color: fg }}
         className="sticky top-0 flex h-[100svh] items-center justify-center overflow-hidden"
       >
-        {/* Faint drifting layers for parallax depth. */}
         <motion.span
           style={{ x: driftA }}
           aria-hidden="true"
@@ -87,7 +78,6 @@ function PinnedStatement() {
           A CREATIVE LAB
         </motion.span>
 
-        {/* The zooming statement. */}
         <motion.h2
           style={{ scale, opacity }}
           className="relative z-10 px-6 text-center font-display text-[clamp(3rem,9vw,8rem)] font-medium uppercase leading-[0.85] tracking-[-0.04em] will-change-transform"
