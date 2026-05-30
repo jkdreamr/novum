@@ -84,15 +84,15 @@ html.is-locked body {
   color: var(--accent);
 }
 
-/* ---- Outline-on-hover display name (Team) ------------------------------------ */
-.outline-name {
+/* ---- Team display name: editorial serif, italic + accent on hover ------------ */
+.team-name {
   color: var(--bone);
-  -webkit-text-stroke: 0 transparent;
+  font-style: normal;
   transition: color 0.4s var(--ease-editorial);
 }
-.group:hover .outline-name {
-  color: transparent;
-  -webkit-text-stroke: 1.5px var(--bone);
+.group:hover .team-name {
+  color: var(--accent);
+  font-style: italic;
 }
 
 /* ---- Small 3D marks — pure CSS 3D (no WebGL), freeze under reduced-motion ----- */

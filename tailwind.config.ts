@@ -12,8 +12,13 @@ const config: Config = {
         accent: '#C8FF5E',
       },
       fontFamily: {
+        // Art-directed type system: a grotesque (brand voice), an editorial serif (Team names),
+        // and a wide/extended display (Join columns) — plus mono for all small labels.
         display: ['var(--font-display)', 'Georgia', 'serif'],
         mono: ['var(--font-mono)', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+        serif: ['var(--font-serif)', 'Georgia', 'serif'],
+        extended: ['var(--font-extended)', 'var(--font-display)', 'sans-serif'],
+        condensed: ['var(--font-condensed)', 'var(--font-display)', 'sans-serif'],
       },
       letterSpacing: {
         label: '0.18em',

@@ -81,7 +81,8 @@ export default function Join() {
         {PATHS.map((p, idx) => (
           <Reveal key={p.word} variant="rise" delay={idx * 0.05}>
             <div className="flex flex-col gap-3 border-t border-bone/20 pt-5">
-              <HoverLink className="font-display text-[clamp(1.4rem,3.4vw,2.25rem)] font-medium uppercase leading-none">
+              {/* Extended display face (Syne) — a distinct texture vs the grotesque elsewhere. */}
+              <HoverLink className="font-extended text-[clamp(1.3rem,3.2vw,2.1rem)] font-bold uppercase leading-none tracking-[-0.01em]">
                 {p.word}
               </HoverLink>
               <span className="text-[0.7rem] uppercase tracking-label text-bone/50">— {p.desc}</span>

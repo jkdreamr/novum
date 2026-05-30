@@ -30,11 +30,11 @@ export default function About() {
         {/* Bottom frame labels — sub-line left, positioning line right. */}
         <div className="flex flex-col gap-4 text-[0.7rem] uppercase tracking-label sm:flex-row sm:items-end sm:justify-between sm:gap-8">
           <Reveal variant="rise" as="span">
-            <span className="text-bone/55">MUSIC / VISUALS / PERFORMANCE / SYSTEMS</span>
+            <span className="text-bone/55">MUSIC / VISUALS / PERFORMANCE / SYSTEMS / ART.</span>
           </Reveal>
           <Reveal variant="rise" delay={0.05} as="span">
             <span className="block max-w-[42ch] text-bone/45 sm:text-right">
-              A label, a collective, a creative lab — the next label is a lab.
+              WE BELIEVE THIS IS THE FUTURE.
             </span>
           </Reveal>
         </div>

@@ -19,15 +19,16 @@ Tagline: "Artists building the tools behind their art." Copy is sourced from the
 - Build: `pnpm build`
 - Lint: `pnpm lint`
 
-## Fonts (next/font/google — no external CSS @import)
-- Display: **Space Grotesk** (variable) → `--font-display`, Tailwind `font-display`. Headings
-  use `font-medium`. Mono: **Space Mono** → `--font-mono`, Tailwind `font-mono` (also the body
-  default).
-- Four extra faces, loaded ONLY for the preloader's per-word font cycling: **Instrument Serif**
-  (`--font-serif`), **Oswald** (`--font-condensed`), **Syne** (`--font-extended`), **Playfair
-  Display** italic (`--font-contrast`).
-- All six are wired in `lib/fonts.ts` (exported as `fontVariables`) and applied together on
-  `<html>` in `app/layout.tsx`. `next/font` fetches + self-hosts at build time (needs network).
+## Fonts (next/font/google — no external CSS @import) + art-directed type system
+- Six faces, all in `lib/fonts.ts` (`fontVariables`) applied on `<html>`. Tailwind families:
+  `font-display` **Space Grotesk** (var `--font-display`), `font-mono` **Space Mono**
+  (`--font-mono`, body default), `font-serif` **Instrument Serif** (`--font-serif`),
+  `font-extended` **Syne** (`--font-extended`), `font-condensed` **Oswald** (`--font-condensed`),
+  + Playfair Display italic (`--font-contrast`).
+- Per-section type (cohesive palette, varied type): About / Statement / Join statement+closing /
+  Apply = **Space Grotesk** (grotesque brand voice); Team names = **Instrument Serif** (editorial
+  serif, italic+accent on hover — the names carry the section); Join's four columns = **Syne**
+  (wide/extended); preloader cycles mono/serif/condensed/extended/italic. Mono for all labels.
 
 ## Design tokens (`tailwind.config.ts`)
 - Colors: `ink` #0A0A0A (bg), `bone` #EDE8DF (text), `accent` #C8FF5E (faded acid-lime, used
@@ -63,16 +64,19 @@ type-driven (see `Statement`).
 ## Layout + sections
 - Consistent page gutter everywhere: `px-6 sm:px-10 lg:px-16` (24/40/64px).
 - EXACTLY three sections: `components/sections/{About,Team,Join}`. About = hero only (pure-type
-  headline, clip-mask line reveals). Team = NAMES ONLY (no images) — big outline-on-hover display
-  names + a small auto-rotating CSS-3D mark each (cube / gyro), role in mono, optional click-to-
-  expand focus blurb; on desktop the two names parallax at different rates on scroll. Join =
-  statement + four ways in + Apply (clip-mask reveal) + styled email + a scroll-linked closing
-  ("BUILD THE NEW MEDIUM." scales from the gutter + tracks letter-spacing out on desktop, static
-  on mobile). `Statement` is a transition (not a section) between About and Team.
-- Components: `Preloader`, `Nav`, `HoverLink` (doubled-text reveal; a/button/span), `Reveal`,
-  `Statement` (the dramatic type beat), `Mark3D` (CSS-3D mark), `Footer`. Desktop-vs-mobile
-  effect gating goes through `hooks/useDesktopMotion.ts` (`min-width:768px` + no-preference).
-- NO video / WebGL anywhere — pure type + motion. The Team 3D marks are pure CSS 3D (see Mark3D).
+  headline, clip-mask line reveals). Team = NAMES ONLY (no images) — big editorial-serif names
+  (italic+accent on hover) + a 3D icon each (desktop: WebGL glass; mobile/reduced/error: CSS-3D
+  mark), role in mono, optional click-to-expand focus; desktop names parallax at different rates.
+  Join = statement + four ways in (Syne) + Apply (clip-mask reveal) + styled email + a scroll-
+  linked closing ("BUILD THE NEW MEDIUM." scales from the gutter + tracks letter-spacing out on
+  desktop, static on mobile). `Statement` is a transition (not a section) between About and Team.
+- Components: `Preloader`, `Nav`, `HoverLink`, `Reveal`, `Statement`, `Mark3D` (CSS-3D fallback),
+  `GlassIcon` (lazy WebGL wrapper), `GlassScene` (R3F glass), `ErrorBoundary`, `Footer`. Desktop
+  gating via `hooks/useDesktopMotion.ts` (`min-width:768px` + no-preference).
+- NO video. WebGL is used ONLY for the desktop Team glass icons: `GlassIcon` lazy-mounts
+  `GlassScene` (three / @react-three/fiber / drei) when in view, wrapped in `ErrorBoundary` whose
+  fallback is the CSS `Mark3D` — so a WebGL failure can't break the page. Three.js is a separate
+  lazy chunk (NOT in the initial bundle); never loaded on mobile (which renders the CSS mark).
 
 ## Preloader (`components/Preloader.tsx`) — timing
 - Counter 0→100 over `COUNT_MS = 4000` (smoothstep, no sprint). The center word cycles every
@@ -82,12 +86,12 @@ type-driven (see `Statement`).
   session; reduced-motion skips; hard dismiss `HARD_DISMISS_MS = 5500`.
 
 ## Statement (`components/Statement.tsx`) — the dramatic scroll moment
-- Desktop + motion-OK → a pinned, scroll-LINKED beat (`useScroll`/`useTransform`): palette
-  inverts ink↔bone, "THE NEXT / LABEL IS / A LAB." zooms toward the viewer (`scale 0.7→1.2`,
-  opacity fade-IN only so it stays visible), faint oversized words drift horizontally for depth.
-  Track is `h-[140vh]` (~40vh pin) — TIGHTENED from 170vh, and the statement no longer fades to
-  empty, which is what removed the dead black screen before Team (palette returns to ink at the
-  end → continuous handoff). Mobile / reduced-motion / SSR → a static bone-on-ink block.
+- Desktop + motion → PinnedStatement: pinned invert (ink↔bone) + gradual zoom. Track `h-[135vh]`
+  (~35vh pin, trimmed from 140); the zoom now spans ~80% of the pin (slower/gradual move) and the
+  palette returns to ink by ~0.9 so there's no dead black tail before Team.
+- Mobile + motion → FadeStatement: NOT pinned; the bg crossfades ink→bone→ink with scroll so the
+  cream beat eases in/out of its ink neighbours — fixes the hard horizontal cream/black seam.
+- Reduced-motion → StaticStatement: plain ink section, fully visible, no motion.
 
 ## Mark3D (`components/Mark3D.tsx`) — the Team 3D icons
 - Pure CSS 3D (no WebGL): a wireframe `cube` or a `gyro` of rings, `transform-style: preserve-3d`,
