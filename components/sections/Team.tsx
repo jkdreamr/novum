@@ -121,7 +121,11 @@ export default function Team() {
   const parallax = [y1, y2];
 
   return (
-    <section id="team" ref={ref} className="px-6 py-[clamp(6rem,12vw,11rem)] sm:px-10 lg:px-16">
+    <section
+      id="team"
+      ref={ref}
+      className="px-6 pb-[clamp(6rem,12vw,11rem)] pt-[clamp(9rem,22vw,18rem)] sm:px-10 lg:px-16"
+    >
       <div className="mb-[clamp(2.5rem,6vw,5rem)] grid grid-cols-12 gap-y-6">
         <span className="col-span-12 text-[0.7rem] uppercase tracking-label text-bone/50 md:col-span-3">
           ( 02 / TEAM )
