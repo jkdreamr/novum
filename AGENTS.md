@@ -88,9 +88,11 @@ type-driven (see `Statement`).
   drei `Lightformer`s inside `<Environment>` (NO `preset` — the HDRI CDN is network-blocked; with
   no env the glass renders black, which was the "black box" bug). Camera `fov 30 @ z 5.5` frames
   the gem/torus-knot with padding (not clipped); slow `useFrame` revolve. Tuned for fast first
-  paint: `dpr={[1,2]}`, transmission `samples={6}`, `Environment resolution={128}`, lazy-mounted
-  via IntersectionObserver `rootMargin: 300px` with the CSS `Mark3D` shown instantly as the
-  placeholder while the canvas spins up.
+  paint: `dpr={[1,1.5]}`, transmission `samples={4}` / `resolution={192}`, `Environment
+  resolution={128}`. `GlassIcon` warms the Three.js chunk on `requestIdleCallback` (so it's cached
+  before Team scrolls in) and mounts the canvas via IntersectionObserver `rootMargin: 600px`, with
+  the CSS `Mark3D` shown instantly as the placeholder. (Two separate inline canvases each carry
+  their own small Environment — can't share one across two DOM trees.)
 
 ## Preloader (`components/Preloader.tsx`) — timing
 - Counter 0→100 over `COUNT_MS = 4000` (smoothstep, no sprint). The center word cycles every
@@ -100,15 +102,15 @@ type-driven (see `Statement`).
   session; reduced-motion skips; hard dismiss `HARD_DISMISS_MS = 5500`.
 
 ## Statement (`components/Statement.tsx`) — the bone "wash" beat
-- The cream/white moment is back, made FLASH-PROOF. Instead of interpolating `backgroundColor`
-  (which can overshoot to white and pops on fast scroll), a `bg-bone` overlay's OPACITY is eased
-  by scrollYProgress (`useTransform [0,0.4,0.6,1]→[0,1,1,0]` with `ease: easeInOut`): opacity is
-  clamped 0–1 (can't overshoot), bone is `#EDE8DF` (not white), and the long track spreads the
-  in→hold→out over enough scroll to be gradual at any speed. The serif statement + ghost words use
-  `mix-blend-difference` (inside an `isolate` stage) so they stay readable as the bg washes
-  ink→bone→ink. Shared `WashStage`.
-- Desktop + motion → PinnedStatement: pinned over `h-[185vh]` (the single dial — lengthen for an
-  even gentler wash, shorten if it feels draggy) + the serif statement zooms. Mobile + motion →
+- The cream/white moment, made FLASH-PROOF. Instead of interpolating `backgroundColor` (which can
+  overshoot to white and pops on fast scroll), a `bg-bone` overlay's OPACITY is eased by
+  scrollYProgress: `useTransform [0,0.42,0.86,1]→[0,1,1,0]` with `ease: easeInOut` — a gentle ease
+  IN, a LONG hold (0.42→0.86) so the white sits there at a relaxed pace, then a QUICK ease OUT
+  (0.86→1) so the next section arrives right after the white resolves (no long fade-to-black
+  trailing region). Opacity is clamped 0–1 (can't overshoot), bone is `#EDE8DF` (not white). The
+  serif statement + ghost words use `mix-blend-difference` (inside an `isolate` stage) so they
+  stay readable as the bg washes ink→bone→ink. Shared `WashStage`.
+- Desktop + motion → PinnedStatement: pinned over `h-[195vh]` (the dial). Mobile + motion →
   FlowStatement: NOT pinned; the wash maps to the section passing through the viewport (cheap,
   smooth on touch). Reduced-motion → StaticStatement (plain ink, serif headline, no wash).
 

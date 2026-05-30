@@ -41,11 +41,13 @@ function StaticStatement() {
 
 /* The shared washing stage. `p` is scroll progress 0→1 across whatever range the parent provides. */
 function WashStage({ p, zoom }: { p: MotionValue<number>; zoom: boolean }) {
-  // Bone wash: eased in (0→0.4), hold, eased out (0.6→1). Opacity only — no colour interpolation.
-  const wash = useTransform(p, [0, 0.4, 0.6, 1], [0, 1, 1, 0], { ease: easeInOut });
-  const scale = useTransform(p, [0, 0.85], zoom ? [0.72, 1.12] : [0.92, 1.04]);
-  const textOpacity = useTransform(p, [0, 0.12, 0.92, 1], [0, 1, 1, 0.7]);
-  const ghostOpacity = useTransform(p, [0, 0.22, 0.78, 1], [0, 0.12, 0.12, 0]);
+  // Bone wash: gentle ease in (0→0.42), LONG hold (0.42→0.86) so the white moment is relaxed,
+  // then a QUICK ease out (0.86→1) so there's almost no trailing fade-to-black before the next
+  // section. Opacity only — no colour interpolation, so it can't overshoot to white.
+  const wash = useTransform(p, [0, 0.42, 0.86, 1], [0, 1, 1, 0], { ease: easeInOut });
+  const scale = useTransform(p, [0, 0.86], zoom ? [0.72, 1.12] : [0.92, 1.04]);
+  const textOpacity = useTransform(p, [0, 0.12, 0.92, 1], [0, 1, 1, 0.8]);
+  const ghostOpacity = useTransform(p, [0, 0.22, 0.86, 1], [0, 0.12, 0.12, 0]);
   const driftA = useTransform(p, [0, 1], ['10%', '-22%']);
   const driftB = useTransform(p, [0, 1], ['-14%', '18%']);
 
@@ -85,12 +87,14 @@ function WashStage({ p, zoom }: { p: MotionValue<number>; zoom: boolean }) {
   );
 }
 
-/* Desktop: pinned over a long track so the wash in→hold→out is graceful at any scroll speed. */
+/* Desktop: pinned over a long track so the wash in→hold→out is graceful at any scroll speed. The
+   long bone HOLD makes it feel relaxed; the quick wash-out (in WashStage) means the next section
+   arrives shortly after the white resolves — no big trailing black region. */
 function PinnedStatement() {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] });
   return (
-    <section ref={ref} aria-label="The next label is a lab" className="relative h-[185vh]">
+    <section ref={ref} aria-label="The next label is a lab" className="relative h-[195vh]">
       <div className="sticky top-0">
         <WashStage p={scrollYProgress} zoom />
       </div>

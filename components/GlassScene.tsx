@@ -21,8 +21,8 @@ function Glass({ shape }: { shape: 'gem' | 'knot' }) {
         <torusKnotGeometry args={[0.62, 0.26, 180, 32]} />
       )}
       <MeshTransmissionMaterial
-        samples={6}
-        resolution={256}
+        samples={4}
+        resolution={192}
         transmission={1}
         thickness={1.4}
         roughness={0.12}
@@ -51,7 +51,7 @@ function Glass({ shape }: { shape: 'gem' | 'knot' }) {
 export default function GlassScene({ shape }: { shape: 'gem' | 'knot' }) {
   return (
     <Canvas
-      dpr={[1, 2]}
+      dpr={[1, 1.5]}
       camera={{ position: [0, 0, 5.5], fov: 30 }}
       gl={{ alpha: true, antialias: true }}
       style={{ background: 'transparent' }}

@@ -25,8 +25,14 @@ export default function GlassIcon({ shape, fallback, size = 'clamp(5rem,12vw,9re
   const [inView, setInView] = useState(false);
 
   useEffect(() => {
+    // Warm the Three.js chunk in the background (idle if available) so it's already cached by the
+    // time Team scrolls in — first paint of the glass is then near-instant.
+    const warm = () => void import('@/components/GlassScene');
+    const useIdle = typeof window.requestIdleCallback === 'function';
+    const idleId = useIdle ? window.requestIdleCallback(warm, { timeout: 2500 }) : window.setTimeout(warm, 1500);
+
+    // Mount the canvas a bit before it's visible (rootMargin) so it's ready as it enters.
     const el = ref.current;
-    if (!el) return;
     const io = new IntersectionObserver(
       ([e]) => {
         if (e.isIntersecting) {
@@ -34,10 +40,15 @@ export default function GlassIcon({ shape, fallback, size = 'clamp(5rem,12vw,9re
           io.disconnect();
         }
       },
-      { rootMargin: '300px' },
+      { rootMargin: '600px' },
     );
-    io.observe(el);
-    return () => io.disconnect();
+    if (el) io.observe(el);
+
+    return () => {
+      io.disconnect();
+      if (useIdle) window.cancelIdleCallback(idleId as number);
+      else window.clearTimeout(idleId as number);
+    };
   }, []);
 
   const style = { width: size, height: size } as CSSProperties;
