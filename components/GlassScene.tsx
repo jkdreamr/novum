@@ -21,7 +21,7 @@ function Glass({ shape }: { shape: 'gem' | 'knot' }) {
         <torusKnotGeometry args={[0.62, 0.26, 180, 32]} />
       )}
       <MeshTransmissionMaterial
-        samples={8}
+        samples={6}
         resolution={256}
         transmission={1}
         thickness={1.4}
@@ -60,11 +60,11 @@ export default function GlassScene({ shape }: { shape: 'gem' | 'knot' }) {
       <ambientLight intensity={0.6} />
       <directionalLight position={[4, 5, 5]} intensity={2.2} />
       <Glass shape={shape} />
-      {/* Local studio environment — lights the glass, never shown as a backdrop (background off). */}
-      <Environment resolution={256}>
+      {/* Local studio environment — lights the glass, never shown as a backdrop (background off).
+          Small resolution (128) keeps the cubemap render cheap so first paint is quick. */}
+      <Environment resolution={128}>
         <Lightformer form="rect" intensity={4} position={[0, 3, 3]} scale={[8, 4, 1]} />
         <Lightformer form="rect" intensity={2} position={[-4, 0, 2]} scale={[3, 8, 1]} color="#EDE8DF" />
-        <Lightformer form="rect" intensity={2} position={[4, 0, 2]} scale={[3, 8, 1]} color="#EDE8DF" />
         <Lightformer form="rect" intensity={2.5} position={[0, 0, -5]} scale={[10, 10, 1]} />
         <Lightformer form="circle" intensity={3} position={[2, 2, 3]} scale={[2, 2, 1]} color="#C8FF5E" />
       </Environment>

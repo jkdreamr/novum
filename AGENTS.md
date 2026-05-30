@@ -87,7 +87,10 @@ type-driven (see `Statement`).
   thickness 1.4, roughness 0.12, chromaticAberration 0.04, clearcoat) lit by a LOCAL studio rig of
   drei `Lightformer`s inside `<Environment>` (NO `preset` — the HDRI CDN is network-blocked; with
   no env the glass renders black, which was the "black box" bug). Camera `fov 30 @ z 5.5` frames
-  the gem/torus-knot with padding (not clipped); slow `useFrame` revolve; `dpr={[1,2]}`.
+  the gem/torus-knot with padding (not clipped); slow `useFrame` revolve. Tuned for fast first
+  paint: `dpr={[1,2]}`, transmission `samples={6}`, `Environment resolution={128}`, lazy-mounted
+  via IntersectionObserver `rootMargin: 300px` with the CSS `Mark3D` shown instantly as the
+  placeholder while the canvas spins up.
 
 ## Preloader (`components/Preloader.tsx`) — timing
 - Counter 0→100 over `COUNT_MS = 4000` (smoothstep, no sprint). The center word cycles every
@@ -96,15 +99,18 @@ type-driven (see `Statement`).
   On 100 it lands on NOVUM (display face), holds `HOLD_MS = 550`, then wipes (0.55s). Once per
   session; reduced-motion skips; hard dismiss `HARD_DISMISS_MS = 5500`.
 
-## Statement (`components/Statement.tsx`) — the dramatic scroll moment
-- STAYS ON INK — there is NO background-colour animation. The old ink↔bone invert was a
-  full-screen bright sweep over a short pin and read as a WHITE/cream FLASH on fast scroll, so it
-  was removed. The drama is now pure type: the editorial-serif "THE NEXT / LABEL IS / A LAB."
-  zooms toward the viewer (`scale 0.66→1.12` across ~80% of the pin) while faint oversized words
-  drift horizontally. Track `h-[135vh]`. No bg colour = no flash at any speed, and every section
-  seam is ink→ink.
-- Desktop + motion → PinnedStatement (pinned zoom). Mobile / reduced-motion / SSR →
-  StaticStatement (plain ink section, serif headline, clip-mask reveal).
+## Statement (`components/Statement.tsx`) — the bone "wash" beat
+- The cream/white moment is back, made FLASH-PROOF. Instead of interpolating `backgroundColor`
+  (which can overshoot to white and pops on fast scroll), a `bg-bone` overlay's OPACITY is eased
+  by scrollYProgress (`useTransform [0,0.4,0.6,1]→[0,1,1,0]` with `ease: easeInOut`): opacity is
+  clamped 0–1 (can't overshoot), bone is `#EDE8DF` (not white), and the long track spreads the
+  in→hold→out over enough scroll to be gradual at any speed. The serif statement + ghost words use
+  `mix-blend-difference` (inside an `isolate` stage) so they stay readable as the bg washes
+  ink→bone→ink. Shared `WashStage`.
+- Desktop + motion → PinnedStatement: pinned over `h-[185vh]` (the single dial — lengthen for an
+  even gentler wash, shorten if it feels draggy) + the serif statement zooms. Mobile + motion →
+  FlowStatement: NOT pinned; the wash maps to the section passing through the viewport (cheap,
+  smooth on touch). Reduced-motion → StaticStatement (plain ink, serif headline, no wash).
 
 ## Mark3D (`components/Mark3D.tsx`) — the Team 3D icons
 - Pure CSS 3D (no WebGL): a wireframe `cube` or a `gyro` of rings, `transform-style: preserve-3d`,
