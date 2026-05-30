@@ -49,7 +49,7 @@ function FlowStatement() {
 
   return (
     <section ref={ref} aria-label="The next label is a lab" className="relative">
-      <div className="relative isolate flex h-[108svh] items-center justify-center overflow-hidden bg-ink">
+      <div className="relative isolate flex h-[116svh] items-center justify-center overflow-hidden bg-ink">
         {/* Bone wash overlay — opacity eased by scroll. */}
         <motion.div style={{ opacity: wash }} className="pointer-events-none absolute inset-0 bg-bone" aria-hidden="true" />
 
