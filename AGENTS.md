@@ -25,10 +25,14 @@ Tagline: "Artists building the tools behind their art." Copy is sourced from the
   (`--font-mono`, body default), `font-serif` **Instrument Serif** (`--font-serif`),
   `font-extended` **Syne** (`--font-extended`), `font-condensed` **Oswald** (`--font-condensed`),
   + Playfair Display italic (`--font-contrast`).
-- Per-section type (cohesive palette, varied type): About / Statement / Join statement+closing /
-  Apply = **Space Grotesk** (grotesque brand voice); Team names = **Instrument Serif** (editorial
-  serif, italic+accent on hover — the names carry the section); Join's four columns = **Syne**
-  (wide/extended); preloader cycles mono/serif/condensed/extended/italic. Mono for all labels.
+- Per-section type — three display voices, art-directed for obvious contrast:
+  • **Space Grotesk** (grotesque, `font-display`): About hero, Join "JOIN / THE FIRST / CIRCLE",
+    APPLY, "THE PEOPLE BUILDING IT.", the Statement drift words.
+  • **Instrument Serif** (editorial serif, `font-serif`): the Statement headline, Join's four
+    columns (ARTISTS/BUILDERS/SPONSORS/INVESTORS), and the Join closing "BUILD THE NEW MEDIUM."
+  • **Syne** (wide extended, `font-extended`): the Team names ONLY (uniquely distinctive; accent
+    on hover via `.team-name`).
+  • Mono for all small labels; the preloader additionally cycles condensed/italic faces.
 
 ## Design tokens (`tailwind.config.ts`)
 - Colors: `ink` #0A0A0A (bg), `bone` #EDE8DF (text), `accent` #C8FF5E (faded acid-lime, used
@@ -75,8 +79,15 @@ type-driven (see `Statement`).
   gating via `hooks/useDesktopMotion.ts` (`min-width:768px` + no-preference).
 - NO video. WebGL is used ONLY for the desktop Team glass icons: `GlassIcon` lazy-mounts
   `GlassScene` (three / @react-three/fiber / drei) when in view, wrapped in `ErrorBoundary` whose
-  fallback is the CSS `Mark3D` — so a WebGL failure can't break the page. Three.js is a separate
-  lazy chunk (NOT in the initial bundle); never loaded on mobile (which renders the CSS mark).
+  fallback is the CSS `Mark3D`. Three.js is a separate lazy chunk (NOT in the initial bundle);
+  never loaded on mobile (which renders the CSS mark).
+- `GlassScene` glass: FULLY TRANSPARENT canvas (`gl={{ alpha:true }}` + `style background
+  transparent` + `onCreated → gl.setClearColor(0x000000, 0)`; the container has no bg/rounded
+  panel) so it floats on the ink page. `MeshTransmissionMaterial` (transmission 1, ior 1.45,
+  thickness 1.4, roughness 0.12, chromaticAberration 0.04, clearcoat) lit by a LOCAL studio rig of
+  drei `Lightformer`s inside `<Environment>` (NO `preset` — the HDRI CDN is network-blocked; with
+  no env the glass renders black, which was the "black box" bug). Camera `fov 30 @ z 5.5` frames
+  the gem/torus-knot with padding (not clipped); slow `useFrame` revolve; `dpr={[1,2]}`.
 
 ## Preloader (`components/Preloader.tsx`) — timing
 - Counter 0→100 over `COUNT_MS = 4000` (smoothstep, no sprint). The center word cycles every
@@ -86,12 +97,14 @@ type-driven (see `Statement`).
   session; reduced-motion skips; hard dismiss `HARD_DISMISS_MS = 5500`.
 
 ## Statement (`components/Statement.tsx`) — the dramatic scroll moment
-- Desktop + motion → PinnedStatement: pinned invert (ink↔bone) + gradual zoom. Track `h-[135vh]`
-  (~35vh pin, trimmed from 140); the zoom now spans ~80% of the pin (slower/gradual move) and the
-  palette returns to ink by ~0.9 so there's no dead black tail before Team.
-- Mobile + motion → FadeStatement: NOT pinned; the bg crossfades ink→bone→ink with scroll so the
-  cream beat eases in/out of its ink neighbours — fixes the hard horizontal cream/black seam.
-- Reduced-motion → StaticStatement: plain ink section, fully visible, no motion.
+- STAYS ON INK — there is NO background-colour animation. The old ink↔bone invert was a
+  full-screen bright sweep over a short pin and read as a WHITE/cream FLASH on fast scroll, so it
+  was removed. The drama is now pure type: the editorial-serif "THE NEXT / LABEL IS / A LAB."
+  zooms toward the viewer (`scale 0.66→1.12` across ~80% of the pin) while faint oversized words
+  drift horizontally. Track `h-[135vh]`. No bg colour = no flash at any speed, and every section
+  seam is ink→ink.
+- Desktop + motion → PinnedStatement (pinned zoom). Mobile / reduced-motion / SSR →
+  StaticStatement (plain ink section, serif headline, clip-mask reveal).
 
 ## Mark3D (`components/Mark3D.tsx`) — the Team 3D icons
 - Pure CSS 3D (no WebGL): a wireframe `cube` or a `gyro` of rings, `transform-style: preserve-3d`,

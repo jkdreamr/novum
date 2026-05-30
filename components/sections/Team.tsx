@@ -77,7 +77,7 @@ function MemberRow({
         <div className="flex items-center justify-between gap-5">
           <motion.h3
             style={{ y: nameY }}
-            className="team-name min-w-0 font-serif uppercase leading-[0.95] tracking-[-0.01em] text-[clamp(1.85rem,8.5vw,5.75rem)]"
+            className="team-name min-w-0 font-extended font-bold uppercase leading-[0.95] tracking-[-0.02em] text-[clamp(1.85rem,8.5vw,5.75rem)]"
           >
             {member.name}
           </motion.h3>

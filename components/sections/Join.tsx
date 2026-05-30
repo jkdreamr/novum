@@ -31,12 +31,12 @@ function JoinClosing() {
       {desktop ? (
         <motion.h3
           style={{ scale, letterSpacing, opacity }}
-          className="origin-left font-display text-[clamp(1.75rem,7vw,5.5rem)] font-medium uppercase leading-[0.92] text-bone will-change-transform"
+          className="origin-left font-serif text-[clamp(1.85rem,7.5vw,6rem)] uppercase leading-[0.95] text-bone will-change-transform"
         >
           BUILD THE NEW MEDIUM.
         </motion.h3>
       ) : (
-        <h3 className="font-display text-[clamp(1.75rem,7vw,5.5rem)] font-medium uppercase leading-[0.92] tracking-[-0.03em] text-bone">
+        <h3 className="font-serif text-[clamp(1.85rem,7.5vw,6rem)] uppercase leading-[0.95] tracking-[-0.01em] text-bone">
           <Reveal variant="mask">
             <span className="block">BUILD THE NEW MEDIUM.</span>
           </Reveal>
@@ -81,8 +81,8 @@ export default function Join() {
         {PATHS.map((p, idx) => (
           <Reveal key={p.word} variant="rise" delay={idx * 0.05}>
             <div className="flex flex-col gap-3 border-t border-bone/20 pt-5">
-              {/* Extended display face (Syne) — a distinct texture vs the grotesque elsewhere. */}
-              <HoverLink className="font-extended text-[clamp(1.3rem,3.2vw,2.1rem)] font-bold uppercase leading-none tracking-[-0.01em]">
+              {/* Editorial serif — contrasts the grotesque "JOIN / THE FIRST / CIRCLE" above. */}
+              <HoverLink className="font-serif text-[clamp(1.5rem,3.6vw,2.5rem)] uppercase leading-none tracking-[-0.01em]">
                 {p.word}
               </HoverLink>
               <span className="text-[0.7rem] uppercase tracking-label text-bone/50">— {p.desc}</span>
