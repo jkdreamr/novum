@@ -10,7 +10,6 @@ const PATHS = [
   { word: 'ARTISTS', desc: 'build with us' },
   { word: 'BUILDERS', desc: 'make the systems' },
   { word: 'SPONSORS', desc: 'fund the sessions' },
-  { word: 'INVESTORS', desc: 'back the lab' },
 ];
 
 /** Closing line. Desktop: scroll-linked scale-from-gutter + letter-spacing track-out + emphasis

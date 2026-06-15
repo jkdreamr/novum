@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from 'react';
 
-type Kind = 'general' | 'artist' | 'investor';
+type Kind = 'general' | 'artist';
 
 const CONFIG: Record<Kind, { showLinks: boolean; orgLabel: string; messageLabel: string; cta: string }> = {
   general: { showLinks: false, orgLabel: 'Organization (optional)', messageLabel: 'Message', cta: 'Send' },
@@ -11,12 +11,6 @@ const CONFIG: Record<Kind, { showLinks: boolean; orgLabel: string; messageLabel:
     orgLabel: 'Project / alias (optional)',
     messageLabel: 'What you make — and what you’d build if the tooling weren’t in the way',
     cta: 'Submit application',
-  },
-  investor: {
-    showLinks: false,
-    orgLabel: 'Firm / fund (optional)',
-    messageLabel: 'What you invest in, stage, and why NOVUM',
-    cta: 'Start the conversation',
   },
 };
 

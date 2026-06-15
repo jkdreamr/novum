@@ -4,7 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 type Payload = {
-  type?: string; // "general" | "artist" | "investor" | "partner"
+  type?: string; // "general" | "artist" | "partner"
   name?: string;
   email?: string;
   org?: string;
