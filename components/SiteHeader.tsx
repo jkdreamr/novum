@@ -1,9 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import HoverLink from '@/components/HoverLink';
-import { scrollToTop } from '@/hooks/useLenis';
 
 const LINKS = [
   { label: 'Manifesto', href: '/manifesto' },
@@ -14,7 +13,8 @@ const LINKS = [
   { label: 'Contact', href: '/contact' },
 ];
 
-export default function Nav() {
+export default function SiteHeader() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -29,29 +29,34 @@ export default function Nav() {
   }, [open]);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50">
-      <nav className="flex items-center justify-between px-6 py-5 sm:px-10 lg:px-16" aria-label="Primary">
-        <HoverLink
-          className="text-sm font-bold uppercase tracking-label"
-          onClick={(e) => {
-            e.preventDefault();
-            scrollToTop();
-          }}
-          ariaLabel="NOVUM — back to top"
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-bone/10 bg-ink/80 backdrop-blur-md">
+      <nav
+        className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 sm:px-10 lg:px-16"
+        aria-label="Primary"
+      >
+        <Link
+          href="/"
+          className="text-sm font-bold uppercase tracking-label transition-colors hover:text-bone/70"
         >
           NOVUM
-        </HoverLink>
+        </Link>
 
         <div className="hidden items-center gap-7 md:flex">
-          {LINKS.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className="text-xs uppercase tracking-label text-bone/60 transition-colors hover:text-bone"
-            >
-              {l.label}
-            </Link>
-          ))}
+          {LINKS.map((l) => {
+            const active = pathname === l.href;
+            return (
+              <Link
+                key={l.href}
+                href={l.href}
+                aria-current={active ? 'page' : undefined}
+                className={`text-xs uppercase tracking-label transition-colors hover:text-bone ${
+                  active ? 'text-bone' : 'text-bone/55'
+                }`}
+              >
+                {l.label}
+              </Link>
+            );
+          })}
         </div>
 
         <button
@@ -59,7 +64,7 @@ export default function Nav() {
           className="-m-2 p-2 text-xs uppercase tracking-label md:hidden"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
-          aria-controls="mobile-menu"
+          aria-controls="site-mobile-menu"
         >
           {open ? '( Close )' : '( Menu )'}
         </button>
@@ -67,15 +72,15 @@ export default function Nav() {
 
       {open && (
         <div
-          id="mobile-menu"
-          className="fixed inset-0 z-40 flex flex-col items-start justify-center gap-2 bg-ink px-6 sm:px-10 md:hidden"
+          id="site-mobile-menu"
+          className="fixed inset-0 top-[57px] z-40 flex flex-col items-start justify-start gap-1 bg-ink px-6 pt-8 sm:px-10 md:hidden"
         >
           {LINKS.map((l) => (
             <Link
               key={l.href}
               href={l.href}
               onClick={() => setOpen(false)}
-              className="font-display text-[clamp(2.5rem,13vw,4.5rem)] uppercase leading-none transition-colors hover:text-bone/70"
+              className="py-2 font-display text-[clamp(2.25rem,11vw,3.5rem)] uppercase leading-none transition-colors hover:text-bone/70"
             >
               {l.label}
             </Link>

@@ -1,78 +1,65 @@
 'use client';
 
-import { type MouseEvent } from 'react';
-import HoverLink from '@/components/HoverLink';
-import { scrollToTarget, scrollToTop } from '@/hooks/useLenis';
+import Link from 'next/link';
 
-const INDEX = [
-  { label: 'About', target: '#about' },
-  { label: 'Team', target: '#team' },
-  { label: 'Join', target: '#join' },
+const PAGES = [
+  { label: 'Manifesto', href: '/manifesto' },
+  { label: 'Lab', href: '/lab' },
+  { label: 'About', href: '/about' },
+  { label: 'Investors & Partners', href: '/investors' },
+  { label: 'Apply', href: '/apply' },
+  { label: 'Contact', href: '/contact' },
 ];
 
 export default function Footer() {
-  const go = (target: string) => (e: MouseEvent<HTMLElement>) => {
-    e.preventDefault();
-    scrollToTarget(target);
-  };
-
   return (
     <footer className="px-6 pb-8 pt-[clamp(3.5rem,8vw,6rem)] sm:px-10 lg:px-16">
-      <div className="flex flex-col gap-10 border-t border-bone/15 pt-10 sm:flex-row sm:justify-between">
-        {/* Index */}
-        <nav aria-label="Sections" className="flex flex-col items-start gap-3">
-          <span className="mb-2 text-[0.7rem] uppercase tracking-label text-bone/40">( Menu )</span>
-          {INDEX.map((l) => (
-            <HoverLink
-              key={l.target}
-              href={l.target}
-              onClick={go(l.target)}
-              className="py-1.5 text-sm uppercase tracking-label"
+      <div className="grid grid-cols-1 gap-10 border-t border-bone/15 pt-10 sm:grid-cols-3">
+        <nav aria-label="Pages" className="flex flex-col items-start gap-3">
+          <span className="mb-2 text-[0.7rem] uppercase tracking-label text-bone/40">( Index )</span>
+          {PAGES.map((p) => (
+            <Link
+              key={p.href}
+              href={p.href}
+              className="text-sm uppercase tracking-label text-bone/80 transition-colors hover:text-bone"
             >
-              {l.label}
-            </HoverLink>
+              {p.label}
+            </Link>
           ))}
         </nav>
 
-        {/* Reach out */}
         <div className="flex flex-col items-start gap-3">
           <span className="mb-2 text-[0.7rem] uppercase tracking-label text-bone/40">( Reach out )</span>
-          {/* PLACEHOLDER contacts — confirm/replace the address + handle. */}
-          <HoverLink
-            href="mailto:hello@novum.example"
-            className="py-1.5 text-sm uppercase tracking-label"
+          <a
+            href="mailto:novumcreate@gmail.com"
+            className="text-sm uppercase tracking-label text-bone/80 transition-colors hover:text-bone"
           >
-            Email
-          </HoverLink>
-          <HoverLink
-            href="#"
-            onClick={(e) => e.preventDefault()}
-            className="py-1.5 text-sm uppercase tracking-label"
+            novumcreate@gmail.com
+          </a>
+          <Link
+            href="/apply"
+            className="text-sm uppercase tracking-label text-bone/80 transition-colors hover:text-bone"
           >
-            Instagram
-          </HoverLink>
+            Apply as artist / builder
+          </Link>
+          <Link
+            href="/investors"
+            className="text-sm uppercase tracking-label text-bone/80 transition-colors hover:text-bone"
+          >
+            For investors & partners
+          </Link>
         </div>
 
-        {/* Identity */}
         <div className="flex flex-col items-start gap-2 text-[0.7rem] uppercase tracking-label text-bone/45 sm:items-end sm:text-right">
           <span>NOVUM — Artists building the tools behind their art.</span>
+          <span>music · visuals · performance · systems</span>
           <span>( EST. 2026 )</span>
         </div>
       </div>
 
-      {/* Bottom row */}
       <div className="mt-10 flex items-center justify-between border-t border-bone/15 pt-6 text-[0.7rem] uppercase tracking-label text-bone/50">
         <span>© 2026 NOVUM</span>
-        <HoverLink
-          onClick={(e) => {
-            e.preventDefault();
-            scrollToTop();
-          }}
-          ariaLabel="Back to top"
-          className="-m-2 p-2 text-base"
-        >
-          ( ↑ )
-        </HoverLink>
+        <span>The next label is a lab.</span>
       </div>
     </footer>
   );

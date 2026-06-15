@@ -4,8 +4,13 @@
 
 :root {
   --ink: #0a0a0a;
+  --surface: #111317;
+  --graphite: #2a2d34;
+  --steel: #4a5159;
+  --muted: #8a857b;
   --bone: #ede8df;
-  --accent: #c8ff5e;
+  /* Monochrome emphasis — no chromatic accent. Hover/selection/focus use bone. */
+  --accent: #ede8df;
   --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -191,7 +196,7 @@ html.is-locked body {
   background: var(--ink);
 }
 ::-webkit-scrollbar-thumb {
-  background: #2a2a24;
+  background: #2a2d34;
 }
 
 /* Reduced motion: kill animation/transition entirely. */

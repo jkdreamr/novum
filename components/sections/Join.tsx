@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, type FormEvent } from 'react';
+import { useRef, useState, type FormEvent } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import Reveal from '@/components/Reveal';
 import HoverLink from '@/components/HoverLink';
@@ -47,9 +47,33 @@ function JoinClosing() {
 }
 
 export default function Join() {
-  // STYLED-ONLY: this capture does not submit anywhere. preventDefault stops the browser from
-  // navigating; wire it to a real endpoint/provider later to make it functional.
-  const onSubmit = (e: FormEvent) => e.preventDefault();
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'error'>('idle');
+
+  const onSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setStatus('error');
+      return;
+    }
+    setStatus('sending');
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'general',
+          name: 'Newsletter signup',
+          email,
+          message: 'Join the list — signup from the NOVUM site.',
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      setStatus(res.ok && data.ok ? 'ok' : 'error');
+    } catch {
+      setStatus('error');
+    }
+  };
 
   return (
     <section id="join" className="px-6 py-[clamp(6rem,12vw,12rem)] sm:px-10 lg:px-16">
@@ -96,14 +120,18 @@ export default function Join() {
         <Reveal variant="mask">
           <div className="flex flex-col gap-4">
             <span className="text-[0.7rem] uppercase tracking-label text-bone/50">( Apply )</span>
-            {/* PLACEHOLDER address — confirm/replace hello@novum.example. */}
             <HoverLink
-              href="mailto:hello@novum.example"
+              href="/apply"
               className="font-display text-[clamp(2.75rem,9vw,6.5rem)] font-medium uppercase leading-none"
             >
               APPLY
             </HoverLink>
-            <span className="text-[0.7rem] uppercase tracking-label text-bone/50">hello@novum.example</span>
+            <a
+              href="mailto:novumcreate@gmail.com"
+              className="text-[0.7rem] uppercase tracking-label text-bone/50 transition-colors hover:text-bone"
+            >
+              novumcreate@gmail.com
+            </a>
           </div>
         </Reveal>
 
@@ -118,17 +146,32 @@ export default function Join() {
                 id="email"
                 name="email"
                 type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="YOUR EMAIL"
                 autoComplete="email"
                 className="w-full bg-transparent text-sm uppercase tracking-label text-bone placeholder:text-bone/35 focus:outline-none"
               />
-              <HoverLink className="shrink-0 text-xs uppercase tracking-label">
-                ( Submit )
-              </HoverLink>
+              <button
+                type="submit"
+                disabled={status === 'sending'}
+                className="shrink-0 text-xs uppercase tracking-label transition-opacity hover:opacity-70 disabled:opacity-40"
+              >
+                {status === 'sending' ? '( … )' : '( Submit )'}
+              </button>
             </div>
-            <p className="text-[0.65rem] uppercase tracking-label text-bone/30">
-              ( Non-functional — wire to an endpoint to enable )
-            </p>
+            {status === 'ok' ? (
+              <p className="text-[0.65rem] uppercase tracking-label text-bone/50">( You’re on the list )</p>
+            ) : status === 'error' ? (
+              <p className="text-[0.65rem] uppercase tracking-label text-bone/50">
+                ( Couldn’t submit — email novumcreate@gmail.com )
+              </p>
+            ) : (
+              <p className="text-[0.65rem] uppercase tracking-label text-bone/30">
+                ( We only write when there’s something real to show )
+              </p>
+            )}
           </form>
         </Reveal>
       </div>

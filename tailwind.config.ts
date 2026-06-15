@@ -5,11 +5,16 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // The whole palette: near-black ground, bone text, one restrained accent.
+        // Dark monochrome system: near-black ground, bone text, graphite/steel dark tones.
+        // No chromatic accent — emphasis is carried by contrast (bone) and weight.
         ink: '#0A0A0A',
+        surface: '#111317',
+        graphite: '#2A2D34',
+        steel: '#4A5159',
+        muted: '#8A857B',
         bone: '#EDE8DF',
-        // Faded acid-lime — used sparingly (hover ticks, the inline media chip border).
-        accent: '#C8FF5E',
+        // "accent" kept as a token name for back-compat; mapped to bone (monochrome emphasis).
+        accent: '#EDE8DF',
       },
       fontFamily: {
         // Art-directed type system: a grotesque (brand voice), an editorial serif (Team names),
