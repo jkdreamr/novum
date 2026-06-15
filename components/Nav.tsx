@@ -9,7 +9,6 @@ const LINKS = [
   { label: 'Manifesto', href: '/manifesto' },
   { label: 'Lab', href: '/lab' },
   { label: 'About', href: '/about' },
-  { label: 'Investors', href: '/investors' },
   { label: 'Apply', href: '/apply' },
   { label: 'Contact', href: '/contact' },
 ];

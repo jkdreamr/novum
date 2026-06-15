@@ -4,7 +4,6 @@ const PAGES = [
   { label: 'Manifesto', href: '/manifesto' },
   { label: 'Lab', href: '/lab' },
   { label: 'About', href: '/about' },
-  { label: 'Investors & Partners', href: '/investors' },
   { label: 'Apply', href: '/apply' },
   { label: 'Contact', href: '/contact' },
 ];
@@ -13,7 +12,7 @@ const PAGES = [
 const CONTACTS = [
   { label: 'General', email: 'novumcreate@gmail.com' },
   { label: 'Artists & builders', email: 'novumcreate@gmail.com' },
-  { label: 'Investors & partners', email: 'novumcreate@gmail.com' },
+  { label: 'Partners & press', email: 'novumcreate@gmail.com' },
 ];
 
 export default function SiteFooter() {

@@ -4,7 +4,7 @@ import ContactForm from '@/components/ContactForm';
 
 export const metadata: Metadata = {
   title: 'Contact',
-  description: 'Reach NOVUM — general, artist, builder, partner, press, and investor inquiries.',
+  description: 'Reach NOVUM — general, artist, builder, partner, and press inquiries.',
 };
 
 export default function ContactPage() {
@@ -19,10 +19,10 @@ export default function ContactPage() {
           <Cell k="General" title="novumcreate@gmail.com">General inbound and everything not listed below.</Cell>
           <Cell k="Artists & builders" title="novumcreate@gmail.com">Collaborations, submissions, technical contributors.</Cell>
           <Cell k="Partners & sponsors" title="novumcreate@gmail.com">Brands, venues, institutions, residencies.</Cell>
-          <Cell k="Investors & press" title="novumcreate@gmail.com">Investor inbound, diligence, and media.</Cell>
+          <Cell k="Press & media" title="novumcreate@gmail.com">Press, media, and general inquiries.</Cell>
         </Grid>
         <p className="text-sm text-bone/50">
-          Role-based aliases (artists@, builders@, partners@, investors@, press@) go live with the company domain.
+          Role-based aliases (artists@, builders@, partners@, press@) go live with the company domain.
         </p>
       </Section>
 

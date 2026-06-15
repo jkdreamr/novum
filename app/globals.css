@@ -9,8 +9,8 @@
   --steel: #4a5159;
   --muted: #8a857b;
   --bone: #ede8df;
-  /* Monochrome emphasis — no chromatic accent. Hover/selection/focus use bone. */
-  --accent: #ede8df;
+  /* Dark-toned accent — muted olive-lime; appears on hover/focus ticks and team names. */
+  --accent: #9dae4a;
   --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
 }
 

@@ -6,7 +6,6 @@ const PAGES = [
   { label: 'Manifesto', href: '/manifesto' },
   { label: 'Lab', href: '/lab' },
   { label: 'About', href: '/about' },
-  { label: 'Investors & Partners', href: '/investors' },
   { label: 'Apply', href: '/apply' },
   { label: 'Contact', href: '/contact' },
 ];
@@ -41,12 +40,6 @@ export default function Footer() {
             className="text-sm uppercase tracking-label text-bone/80 transition-colors hover:text-bone"
           >
             Apply as artist / builder
-          </Link>
-          <Link
-            href="/investors"
-            className="text-sm uppercase tracking-label text-bone/80 transition-colors hover:text-bone"
-          >
-            For investors & partners
           </Link>
         </div>
 
