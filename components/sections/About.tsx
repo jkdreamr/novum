@@ -34,7 +34,7 @@ export default function About() {
           </Reveal>
           <Reveal variant="rise" delay={0.05} as="span">
             <span className="block max-w-[42ch] text-bone/45 sm:text-right">
-              WE BELIEVE THIS IS THE FUTURE.
+              AN ARTIST-FOUNDED CREATIVE TECHNOLOGY COMPANY.
             </span>
           </Reveal>
         </div>
